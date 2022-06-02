@@ -1,3 +1,5 @@
 *.pyc
-/workspace.xml
-/.idea
+workspace.xml
+.idea
+.vscode
+__pycache__
