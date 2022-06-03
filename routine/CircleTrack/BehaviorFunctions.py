@@ -16,10 +16,18 @@ from utils import circle_sizes
 
 from ..CaImaging.Behavior import convert_dlc_to_eztrack, read_eztrack
 from ..CaImaging.LickArduino import clean_Arduino_output
-from ..CaImaging.util import (ScrollPlot, cart2pol, consecutive_dist,
-                              contiguous_regions, disp_frame, find_closest,
-                              nan_array, round_up_to_odd, sync_cameras,
-                              sync_cameras_v4)
+from ..CaImaging.util import (
+    ScrollPlot,
+    cart2pol,
+    consecutive_dist,
+    contiguous_regions,
+    disp_frame,
+    find_closest,
+    nan_array,
+    round_up_to_odd,
+    sync_cameras,
+    sync_cameras_v4,
+)
 
 tkroot = tk.Tk()
 tkroot.withdraw()
@@ -243,9 +251,7 @@ def sync_Arduino_outputs(
     # Not sure what this is for tbh.
     behavior_df.loc[behavior_df["lick_port"] == "Water", "lick_port"] = -1
 
-    behavior_df = behavior_df.astype({"frame": int,
-                                      "water": bool,
-                                      "lick_port": int})
+    behavior_df = behavior_df.astype({"frame": int, "water": bool, "lick_port": int})
     return behavior_df, Arduino_data
 
 
@@ -277,9 +283,10 @@ def find_water_ports(behavior_df, linear_track=False, use_licks=True):
     ports = {}
 
     if linear_track:
-        ports = {'x': np.zeros(2),
-                 'y': np.zeros(2),
-                 }
+        ports = {
+            "x": np.zeros(2),
+            "y": np.zeros(2),
+        }
         n_ports = 2
     else:
         ports["x"] = radius * np.cos(port_angles) + center[0]
@@ -327,8 +334,7 @@ def find_water_ports(behavior_df, linear_track=False, use_licks=True):
     return ports, port_angles
 
 
-def clean_lick_detection(behavior_df, linear_track=False,
-                         threshold=80):
+def clean_lick_detection(behavior_df, linear_track=False, threshold=80):
     """
     Clean lick detection data by checking that the mouse is near the port during
     a detected lick.
@@ -344,10 +350,9 @@ def clean_lick_detection(behavior_df, linear_track=False,
     ---
     behavior_df: cleaned DataFrame after eliminating false positives.
     """
-    ports = find_water_ports(behavior_df,
-                             linear_track=linear_track)[0]
+    ports = find_water_ports(behavior_df, linear_track=linear_track)[0]
     if linear_track:
-        behavior_df.loc[behavior_df.lick_port > 2, 'lick_port'] = -1
+        behavior_df.loc[behavior_df.lick_port > 2, "lick_port"] = -1
 
     lick_frames = behavior_df[behavior_df.lick_port > -1]
     for i, frame in lick_frames.iterrows():
@@ -467,8 +472,10 @@ def find_rewarded_ports(behavior_df):
 
     # Find unique port numbers.
     water_delivered = np.asarray(
-        [np.sum(behavior_df.loc[np.union1d(one_before,
-                                           water), "lick_port"] == i) for i in range(8)]
+        [
+            np.sum(behavior_df.loc[np.union1d(one_before, water), "lick_port"] == i)
+            for i in range(8)
+        ]
     )
     rewarded_ports = np.where(water_delivered > 0.2 * np.std(water_delivered))[0]
 
@@ -690,22 +697,25 @@ def approach_speed(
 
     return approaches
 
+
 def undo_lick_cleaning(folder, rename_old=True):
     behav_cam = 1
     miniscope_cam = 0
     subtract_offset = False
 
     P = Preprocess(folder, behav_cam, miniscope_cam, subtract_offset)
-    df = sync_Arduino_outputs(folder, behav_cam, miniscope_cam,
-                              subtract_offset=subtract_offset)[0]
-    P.behavior_df['lick_port'] = df['lick_port']
-    P.behavior_df['water'] = df['water']
+    df = sync_Arduino_outputs(
+        folder, behav_cam, miniscope_cam, subtract_offset=subtract_offset
+    )[0]
+    P.behavior_df["lick_port"] = df["lick_port"]
+    P.behavior_df["water"] = df["water"]
 
     if rename_old:
-        new_fname = os.path.join(folder, 'PreprocessedBehavior_old.csv')
-        os.rename(P.paths['PreprocessedBehavior'], new_fname)
+        new_fname = os.path.join(folder, "PreprocessedBehavior_old.csv")
+        os.rename(P.paths["PreprocessedBehavior"], new_fname)
 
     P.final_save()
+
 
 class Preprocess:
     def __init__(
@@ -809,10 +819,10 @@ class Preprocess:
         self.behavior_df = clean_lick_detection(self.behavior_df)
         self.save()
 
-    def quick_manual_correct(self, threshold=40, mode='velocity', greater_than=True):
-        if mode == 'velocity':
+    def quick_manual_correct(self, threshold=40, mode="velocity", greater_than=True):
+        if mode == "velocity":
             jump_frames = np.where((self.behavior_df["distance"] > threshold))[0]
-        elif mode == 'radii':
+        elif mode == "radii":
             radii = linearize_trajectory(self.behavior_df)[1]
 
             if greater_than:
@@ -823,9 +833,9 @@ class Preprocess:
         while any(jump_frames):
             self.correct_position(jump_frames[0])
 
-            if mode == 'velocity':
+            if mode == "velocity":
                 jump_frames = np.where((self.behavior_df["distance"] > threshold))[0]
-            elif mode == 'radii':
+            elif mode == "radii":
                 radii = linearize_trajectory(self.behavior_df)[1]
 
                 if greater_than:
@@ -835,9 +845,9 @@ class Preprocess:
 
             self.save()
 
-    def autocorrect_outliers(self, velocity_threshold=40,
-                             blob_threshold=30,
-                             show_plot=False):
+    def autocorrect_outliers(
+        self, velocity_threshold=40, blob_threshold=30, show_plot=False
+    ):
         reference = self.get_reference()
         jump_frames = np.where((self.behavior_df["distance"] > velocity_threshold))[0]
 
@@ -848,24 +858,24 @@ class Preprocess:
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
             ret, frame = cap.read()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            difference = reference-frame
+            difference = reference - frame
 
-            blobs = blob_doh(difference > blob_threshold,
-                             max_sigma=50, threshold=0.05)
+            blobs = blob_doh(difference > blob_threshold, max_sigma=50, threshold=0.05)
 
             if len(blobs) >= 1:
                 if show_plot:
                     ax.cla()
                     ax.imshow(frame)
-                    ax.scatter(self.behavior_df.loc[frame_num, "x"],
-                               self.behavior_df.loc[frame_num, "y"],
-                               marker='+',
-                               color='r')
-                    ax.scatter(blobs[0,0], blobs[0,1],
-                               marker='+', color='g')
+                    ax.scatter(
+                        self.behavior_df.loc[frame_num, "x"],
+                        self.behavior_df.loc[frame_num, "y"],
+                        marker="+",
+                        color="r",
+                    )
+                    ax.scatter(blobs[0, 0], blobs[0, 1], marker="+", color="g")
 
-                self.behavior_df.loc[frame_num, "x"] = blobs[0,0]
-                self.behavior_df.loc[frame_num, "y"] = blobs[0,1]
+                self.behavior_df.loc[frame_num, "x"] = blobs[0, 0]
+                self.behavior_df.loc[frame_num, "y"] = blobs[0, 1]
 
         self.preprocess()
         self.save()
@@ -889,7 +899,6 @@ class Preprocess:
         cap.release()
 
         return np.median(collection, axis=0)
-
 
     def get_timestamps(self):
         if not self.v4:
@@ -1112,7 +1121,7 @@ class BehaviorSession:
             self.meta["behavior_timestamps"] = pd.read_csv(
                 self.meta["paths"]["timestamps"], sep="\t"
             )
-        self.meta['local'] = False
+        self.meta["local"] = False
 
         self.meta["fps"] = self.get_fps()
 
@@ -1254,8 +1263,8 @@ class BehaviorSession:
                 ax=ax,
                 label_axes=False,
             )
-            fig.supxlabel('Time to reach location [s]')
-            fig.supylabel('Trial #')
+            fig.supxlabel("Time to reach location [s]")
+            fig.supylabel("Trial #")
             self.approaches.append(approaches)
 
         if plot:
@@ -1291,8 +1300,10 @@ class BehaviorSession:
         if plot:
             fig, ax = plt.subplots(figsize=(4.35, 5))
             ax.imshow(all_licks)
-            [highlight_column(rewarded, ax, linewidth=5, color='lime', alpha=0.6)
-             for rewarded in np.where(self.data['rewarded_ports'])[0]]
+            [
+                highlight_column(rewarded, ax, linewidth=5, color="lime", alpha=0.6)
+                for rewarded in np.where(self.data["rewarded_ports"])[0]
+            ]
             ax.axis("tight")
             ax.set_xlabel("Water port #")
             ax.set_ylabel("Trial")
@@ -1318,15 +1329,23 @@ class BehaviorSession:
         ax.set_xlabel("Trials")
         ax.set_ylabel("Licks")
 
-    def sdt_trials(self, n_trial_blocks=None, rolling_window=5,
-                   trial_interval=2, plot=True, trial_limit=None):
+    def sdt_trials(
+        self,
+        n_trial_blocks=None,
+        rolling_window=5,
+        trial_interval=2,
+        plot=True,
+        trial_limit=None,
+    ):
         # Split the session into N blocks.
         if n_trial_blocks is not None:
             licks = np.array_split(self.data["all_licks"], n_trial_blocks)
         elif rolling_window is not None:
-            licks = self.rolling_window_licks(window_size=rolling_window,
-                                              trial_interval=trial_interval,
-                                              trial_limit=trial_limit)
+            licks = self.rolling_window_licks(
+                window_size=rolling_window,
+                trial_interval=trial_interval,
+                trial_limit=trial_limit,
+            )
         elif trial_limit is not None:
             licks = [self.data["all_licks"][:trial_limit]]
         else:
@@ -1356,9 +1375,9 @@ class BehaviorSession:
             # To correct d' of infinity or -infinity refer to Stanislaw & Todorov (1999):
             # http://www.jessicagrahn.com/uploads/6/0/8/5/6085172/stanislawtodorovdprim1999.pdf
 
-            #hit_rate = hit_rate / (hit_rate + miss_rate)
-            hit_for_dprime = (correct_licks+0.5) / (go_trials+1)
-            FA_for_dprime = (incorrect_licks+0.5) / (nogo_trials+1)
+            # hit_rate = hit_rate / (hit_rate + miss_rate)
+            hit_for_dprime = (correct_licks + 0.5) / (go_trials + 1)
+            FA_for_dprime = (incorrect_licks + 0.5) / (nogo_trials + 1)
 
             sdt["hits"].append(hit_rate)
             sdt["misses"].append(miss_rate)
@@ -1370,7 +1389,7 @@ class BehaviorSession:
             fig, ax = plt.subplots()
             ax.plot(sdt["hits"])
             ax.plot(sdt["CRs"])
-            ax.plot(sdt["d_prime"], 'k')
+            ax.plot(sdt["d_prime"], "k")
             ax.legend(("Hits", "Correct rejections", "d'"))
 
         self.sdt = sdt
@@ -1378,18 +1397,16 @@ class BehaviorSession:
 
     def rolling_window_licks(self, window_size=4, trial_interval=2, trial_limit=None):
         if trial_limit is None:
-            licks = self.data['all_licks']
+            licks = self.data["all_licks"]
         else:
-            licks = self.data['all_licks'][:trial_limit]
+            licks = self.data["all_licks"][:trial_limit]
         windowed_licks = np.squeeze(
-            sliding_window_view(licks,
-                                (window_size, 8),
-                                axis=(0, 1))[
-            ::trial_interval])
+            sliding_window_view(licks, (window_size, 8), axis=(0, 1))[::trial_interval]
+        )
 
         return windowed_licks
 
-    def get_learning_curve(self, trial_threshold=5, criterion='individual'):
+    def get_learning_curve(self, trial_threshold=5, criterion="individual"):
         """
         Get the smoothed number of correct responses over trials.
         Also get the trial number corresponding to when the mouse
@@ -1424,7 +1441,7 @@ class BehaviorSession:
         middle_of_learning = np.nan
         criterion_trial = np.nan
 
-        if criterion == 'individual':
+        if criterion == "individual":
             criterion = np.max(correct_responses) - 2
 
         # Smooth the correct response time series.
@@ -1465,7 +1482,9 @@ class BehaviorSession:
                 break
 
         # Find criterion trial.
-        consecutive_correct_responses = contiguous_regions(correct_responses >= criterion)
+        consecutive_correct_responses = contiguous_regions(
+            correct_responses >= criterion
+        )
         for correct_run in consecutive_correct_responses:
             duration_of_good_performance = np.diff(correct_run)
             if duration_of_good_performance >= trial_threshold:
@@ -1528,6 +1547,6 @@ def dlc_to_csv(folder: str):
 
 
 if __name__ == "__main__":
-    P = Preprocess(r'Z:\Will\PSAMReversal\PSAM_5\2021_07_29_Goals1\15_49_37')
+    P = Preprocess(r"Z:\Will\PSAMReversal\PSAM_5\2021_07_29_Goals1\15_49_37")
     P.autocorrect_outliers()
     pass

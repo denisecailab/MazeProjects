@@ -40,9 +40,10 @@ def plot_spiral(ScrollObj):
     rewarded = ScrollObj.rewarded
     this_marker_set = ScrollObj.markers[ScrollObj.current_position]
 
-    colors = {True: 'g',
-              False: 'gray',
-              }
+    colors = {
+        True: "g",
+        False: "gray",
+    }
 
     ax.plot(lin_position, t)
     ax.plot(lin_position[this_marker_set], t[this_marker_set], "ro", markersize=2)
@@ -61,8 +62,14 @@ def plot_spiral(ScrollObj):
 
 
 def plot_raster(ScrollObj):
-    attrs = ["rasters", "tuning_curves", "cmap", "port_bins",
-             "rewarded", "interpolation"]
+    attrs = [
+        "rasters",
+        "tuning_curves",
+        "cmap",
+        "port_bins",
+        "rewarded",
+        "interpolation",
+    ]
     check_attrs(ScrollObj, attrs)
 
     axs = ScrollObj.ax
@@ -72,26 +79,31 @@ def plot_raster(ScrollObj):
     interpolation = ScrollObj.interpolation
 
     axs[0].set_title(ScrollObj.titles[ScrollObj.current_position])
-    axs[0].imshow(rasters[ScrollObj.current_position], cmap=cmap, interpolation=interpolation)
+    axs[0].imshow(
+        rasters[ScrollObj.current_position], cmap=cmap, interpolation=interpolation
+    )
     axs[1].plot(tuning_curve[ScrollObj.current_position])
-    axs[0].set_ylabel('Laps')
-    axs[1].set_xlabel('Linearized position')
-    axs[1].set_ylabel('Average transient rate')
-    [ax.axis('auto') for ax in axs]
+    axs[0].set_ylabel("Laps")
+    axs[1].set_xlabel("Linearized position")
+    axs[1].set_ylabel("Average transient rate")
+    [ax.axis("auto") for ax in axs]
 
-    port_colors = {True: 'g',
-                   False: 'gray',
-                   }
+    port_colors = {
+        True: "g",
+        False: "gray",
+    }
     alphas = [0.6 if rewarded else 0.2 for rewarded in ScrollObj.rewarded]
     for ax in axs:
-        for port, rewarded, alpha in zip(ScrollObj.port_bins, ScrollObj.rewarded, alphas):
+        for port, rewarded, alpha in zip(
+            ScrollObj.port_bins, ScrollObj.rewarded, alphas
+        ):
             ax.axvline(x=port, color=port_colors[rewarded], alpha=alpha)
 
     ScrollObj.last_position = len(ScrollObj.rasters)
 
 
 def plot_port_activations(ScrollObj):
-    attrs = ['port_activations', 't_xaxis', 'n_lick_laps', 'rewarded', 'titles']
+    attrs = ["port_activations", "t_xaxis", "n_lick_laps", "rewarded", "titles"]
     check_attrs(ScrollObj, attrs)
 
     axs = ScrollObj.ax
@@ -107,28 +119,31 @@ def plot_port_activations(ScrollObj):
         previously_rewarded = []
 
     for port, (ax, port_activation, lick_approach_sep) in enumerate(
-            zip(axs.flatten(),
-                port_activations[ScrollObj.current_position],
-                n_lick_laps)
+        zip(axs.flatten(), port_activations[ScrollObj.current_position], n_lick_laps)
     ):
-        ax.imshow(port_activation,
-                  extent=[t_xaxis[0], t_xaxis[-1], len(port_activation)+1, 1],
-                  aspect='auto',
-                  cmap='Blues'
-                  )
-        ax.axhline(y=lick_approach_sep, color='k')
-        ax.axvline(x=0, color='r')
+        ax.imshow(
+            port_activation,
+            extent=[t_xaxis[0], t_xaxis[-1], len(port_activation) + 1, 1],
+            aspect="auto",
+            cmap="Blues",
+        )
+        ax.axhline(y=lick_approach_sep, color="k")
+        ax.axvline(x=0, color="r")
 
         if port in rewarded:
-            title_color = 'g'
+            title_color = "g"
         elif port in previously_rewarded:
-            title_color = 'orange'
+            title_color = "orange"
         else:
-            title_color = 'k'
-        ax.set_title(f'Port # {port}', color=title_color)
+            title_color = "k"
+        ax.set_title(f"Port # {port}", color=title_color)
 
-    max_clim = np.max([np.nanmax(activation) for activation in
-                       port_activations[ScrollObj.current_position]])
+    max_clim = np.max(
+        [
+            np.nanmax(activation)
+            for activation in port_activations[ScrollObj.current_position]
+        ]
+    )
     for ax in fig.axes:
         for im in ax.get_images():
             im.set_clim(0, max_clim)
@@ -137,6 +152,7 @@ def plot_port_activations(ScrollObj):
     fig.suptitle(fig_titles[ScrollObj.current_position])
     fig.tight_layout()
     ScrollObj.last_position = len(port_activations)
+
 
 def plot_daily_rasters(ScrollObj):
     attrs = ["rasters", "tuning_curves", "titles"]
@@ -147,14 +163,17 @@ def plot_daily_rasters(ScrollObj):
     tuning_curves = ScrollObj.tuning_curves
     titles = ScrollObj.titles
 
-    for day, (raster, tuning_curve, title) in enumerate(zip(rasters, tuning_curves, titles)):
-        axs[day, 0].imshow(raster[ScrollObj.current_position], cmap='gray', aspect='auto')
-        axs[day, 0].set_ylabel(f'{title} trials', fontsize=14)
+    for day, (raster, tuning_curve, title) in enumerate(
+        zip(rasters, tuning_curves, titles)
+    ):
+        axs[day, 0].imshow(
+            raster[ScrollObj.current_position], cmap="gray", aspect="auto"
+        )
+        axs[day, 0].set_ylabel(f"{title} trials", fontsize=14)
         axs[day, 1].plot(tuning_curve[ScrollObj.current_position])
-        axs[day, 1].set_ylabel('$Ca^{2+}$ event '
-                               'rate', fontsize=14)
-    fig = axs[0,0].figure
-    fig.supxlabel('Linearized position (cm)')
+        axs[day, 1].set_ylabel("$Ca^{2+}$ event " "rate", fontsize=14)
+    fig = axs[0, 0].figure
+    fig.supxlabel("Linearized position (cm)")
     fig.tight_layout()
 
     ymax = []
@@ -166,8 +185,8 @@ def plot_daily_rasters(ScrollObj):
 
     for ax, raster in zip(axs, rasters):
         ax[1].set_ylim([min(ymin), max(ymax)])
-        [ax[1].spines[side].set_visible(False) for side in ['top', 'right']]
-        ax[0].set_yticks([1, raster.shape[1]-1])
+        [ax[1].spines[side].set_visible(False) for side in ["top", "right"]]
+        ax[0].set_yticks([1, raster.shape[1] - 1])
 
         for ax_ in ax:
             ax_.set_xticks(ax_.get_xlim())
@@ -176,8 +195,9 @@ def plot_daily_rasters(ScrollObj):
     ScrollObj.last_position = rasters[0].shape[0] - 1
 
 
-def spiral_plot(t, lin_position, markers, ax=None, marker_legend="Licks",
-                plot_legend=True):
+def spiral_plot(
+    t, lin_position, markers, ax=None, marker_legend="Licks", plot_legend=True
+):
     """
     Plot trajectory of the mouse over time in a circular (polar) axis. Theta
     corresponds to the animal's position while the radius (distance from center)
@@ -222,16 +242,20 @@ def spiral_plot(t, lin_position, markers, ax=None, marker_legend="Licks",
 
     return ax
 
+
 def highlight_column(column, ax, **kwargs):
     ylims = ax.get_ylim()
-    rect = plt.Rectangle((column-0.5, ylims[1]), 1, np.abs(np.diff(ylims)), fill=False, **kwargs)
+    rect = plt.Rectangle(
+        (column - 0.5, ylims[1]), 1, np.abs(np.diff(ylims)), fill=False, **kwargs
+    )
     ax.add_patch(rect)
 
     return rect
 
+
 def color_boxes(boxes, colors, alpha=1):
     if type(colors) is str:
-        colors = [to_rgba(colors, alpha=alpha) for i in boxes['boxes']]
+        colors = [to_rgba(colors, alpha=alpha) for i in boxes["boxes"]]
 
     for patch, med, color in zip(boxes["boxes"], boxes["medians"], colors):
         patch.set_facecolor(color)

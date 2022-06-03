@@ -206,6 +206,7 @@ def open_minian(dpath, fname="minian", backend="zarr", chunks=None):
     else:
         raise NotImplementedError("backend {} not supported".format(backend))
 
+
 def get_transient_timestamps(
     neural_data, thresh_type="eps", do_zscore=True, std_thresh=3
 ):
@@ -252,19 +253,20 @@ def get_transient_timestamps(
 
     return event_times, event_mags, bool_arr
 
+
 def plot_traces(minian_path, neurons=range(10), step=5):
     data = open_minian(minian_path)
-    traces = data['C']
+    traces = data["C"]
 
     # Make shift vector.
-    yshift = [x*step for x in neurons]
+    yshift = [x * step for x in neurons]
 
     fig, ax = plt.subplots()
     # Plot traces with a shift.
     for shift, trace in zip(yshift, traces[neurons]):
-        ax.plot(trace+shift)
+        ax.plot(trace + shift)
 
-    ax.axis('off')
+    ax.axis("off")
 
 
 def nan_corrupted_frames(miniscope_folder, C, S, frames):
@@ -287,19 +289,21 @@ def nan_corrupted_frames(miniscope_folder, C, S, frames):
 
 def spot_check_minian(folder):
     data = open_minian(folder)
-    spike_times = get_transient_timestamps(data["S"],
-                                           thresh_type="eps")[0]
+    spike_times = get_transient_timestamps(data["S"], thresh_type="eps")[0]
 
-    fig, axs = plt.subplots(2, 1, sharex=True, figsize=(8,10))
-    axs[0].eventplot(spike_times, color='k')
+    fig, axs = plt.subplots(2, 1, sharex=True, figsize=(8, 10))
+    axs[0].eventplot(spike_times, color="k")
     axs[0].set_ylabel("Neurons", rotation=-90)
     axs[0].set_yticks([0, len(spike_times)])
     axs[1].plot(data.motion)
 
     return data
 
+
 if __name__ == "__main__":
-    folder = r"Z:\Will\RemoteReversal\Data\Oberon\2021_03_19_Reversal\10_20_31\Miniscope"
+    folder = (
+        r"Z:\Will\RemoteReversal\Data\Oberon\2021_03_19_Reversal\10_20_31\Miniscope"
+    )
     data = open_minian(folder)
 
     pass

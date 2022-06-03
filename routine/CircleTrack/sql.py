@@ -127,7 +127,9 @@ class Database:
             mice = []
             for mouse in mice_:
                 try:
-                    mice.append((tuple(mouse_info[mouse_info["Name"] == mouse[0]].values[0])))
+                    mice.append(
+                        (tuple(mouse_info[mouse_info["Name"] == mouse[0]].values[0]))
+                    )
                 except:
                     raise ValueError(f"{mouse[0]} not in mouse_info.csv")
 

@@ -228,10 +228,7 @@ class Chemogenetics:
                 **kwargs,
             )
             dv[session_type] = self.stack_behavior_dv(df)
-            sessions_df = pd.concat(
-                (sessions_df,
-                 df)
-            )
+            sessions_df = pd.concat((sessions_df, df))
 
         ylabel = {
             "d_prime": "d'",
@@ -1003,9 +1000,11 @@ class Chemogenetics:
             for df in anova_dfs.values():
                 print(df)
 
-            sessions_df.to_csv(os.path.join(self.save_configs['path'],
-                                            folder,
-                                            f'psem_{performance_metric}.csv'))
+            sessions_df.to_csv(
+                os.path.join(
+                    self.save_configs["path"], folder, f"psem_{performance_metric}.csv"
+                )
+            )
         if "G" in panels:
             performance_metric = "hits"
             dv, anova_dfs, fig, sessions_df = self.plot_trial_behavior(
@@ -1021,9 +1020,11 @@ class Chemogenetics:
             for df in anova_dfs.values():
                 print(df)
 
-            sessions_df.to_csv(os.path.join(self.save_configs['path'],
-                                            folder,
-                                            f'psem_{performance_metric}.csv'))
+            sessions_df.to_csv(
+                os.path.join(
+                    self.save_configs["path"], folder, f"psem_{performance_metric}.csv"
+                )
+            )
 
         if "H" in panels:
             performance_metric = "CRs"
@@ -1040,9 +1041,11 @@ class Chemogenetics:
             for df in anova_dfs.values():
                 print(df)
 
-            sessions_df.to_csv(os.path.join(self.save_configs['path'],
-                                            folder,
-                                            f'psem_{performance_metric}.csv'))
+            sessions_df.to_csv(
+                os.path.join(
+                    self.save_configs["path"], folder, f"psem_{performance_metric}.csv"
+                )
+            )
         # if "F" in panels:
         #     performance_metric='d_prime'
         #     fig, axs = plt.subplots(1,2, figsize=(6,4.75), sharey=True)

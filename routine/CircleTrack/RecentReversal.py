@@ -18,13 +18,21 @@ import ruptures as rpt
 import seaborn as sns
 import xarray as xr
 from matplotlib.pyplot import cm
-from networkx.algorithms.approximation.clustering_coefficient import \
-    average_clustering
+from networkx.algorithms.approximation.clustering_coefficient import average_clustering
 from numpy.lib.stride_tricks import sliding_window_view
 from scipy.optimize import curve_fit
 from scipy.spatial import distance
-from scipy.stats import (chisquare, circmean, pearsonr, spearmanr, ttest_1samp,
-                         ttest_ind, ttest_rel, wilcoxon, zscore)
+from scipy.stats import (
+    chisquare,
+    circmean,
+    pearsonr,
+    spearmanr,
+    ttest_1samp,
+    ttest_ind,
+    ttest_rel,
+    wilcoxon,
+    zscore,
+)
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
 from sklearn.impute import SimpleImputer
@@ -38,23 +46,48 @@ from tqdm import tqdm
 
 from Assemblies import find_members, plot_assembly, plot_pattern
 from MiniscopeFunctions import CalciumSession
-from plotting import (color_boxes, highlight_column, plot_daily_rasters,
-                      plot_port_activations, plot_raster, spiral_plot)
+from plotting import (
+    color_boxes,
+    highlight_column,
+    plot_daily_rasters,
+    plot_port_activations,
+    plot_raster,
+    spiral_plot,
+)
 from SessionCollation import MultiAnimal
-from utils import (find_reward_spatial_bins,
-                   format_spatial_location_for_decoder, get_circular_error,
-                   get_equivalent_local_path)
+from utils import (
+    find_reward_spatial_bins,
+    format_spatial_location_for_decoder,
+    get_circular_error,
+    get_equivalent_local_path,
+)
 
-from ..CaImaging.Assemblies import (find_assemblies, lapsed_activation,
-                                    preprocess_multiple_sessions)
-from ..CaImaging.CellReg import (rearrange_neurons, scrollplot_footprints,
-                                 trim_map)
+from ..CaImaging.Assemblies import (
+    find_assemblies,
+    lapsed_activation,
+    preprocess_multiple_sessions,
+)
+from ..CaImaging.CellReg import rearrange_neurons, scrollplot_footprints, trim_map
 from ..CaImaging.PlaceFields import PlaceFields, define_field_bins, spatial_bin
-from ..CaImaging.plotting import (beautify_ax, errorfill, jitter_x,
-                                  plot_xy_line, shiftedColorMap)
-from ..CaImaging.util import (ScrollPlot, bin_transients, cluster_corr,
-                              distinct_colors, group_consecutives, make_bins,
-                              nan_array, open_minian, sem, stack_padding)
+from ..CaImaging.plotting import (
+    beautify_ax,
+    errorfill,
+    jitter_x,
+    plot_xy_line,
+    shiftedColorMap,
+)
+from ..CaImaging.util import (
+    ScrollPlot,
+    bin_transients,
+    cluster_corr,
+    distinct_colors,
+    group_consecutives,
+    make_bins,
+    nan_array,
+    open_minian,
+    sem,
+    stack_padding,
+)
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"
@@ -90,6 +123,7 @@ aged_mice = [
 
 ages = ["young", "aged"]
 age_colors = ["turquoise", "royalblue"]
+
 
 class RecentReversal:
     def __init__(
@@ -319,7 +353,7 @@ class RecentReversal:
                 color=color,
             )
             plt.setp(ax.get_xticklabels(), rotation=45)
-        ax.set_ylim([0, 1500]) # Hard coded for Denise's aesthetic preference.
+        ax.set_ylim([0, 1500])  # Hard coded for Denise's aesthetic preference.
         ax.set_ylabel("# neurons", fontsize=22)
         [ax.spines[side].set_visible(False) for side in ["top", "right"]]
         # self.set_age_legend(fig)
@@ -617,7 +651,7 @@ class RecentReversal:
         )
 
         def objective(x, a, b, c):
-            return a * x + b * x ** 2 + c
+            return a * x + b * x**2 + c
 
         slopes, peak_trial, norm_peak_trial = [[] for i in range(3)]
         for mouse in df.mice.unique():
@@ -1114,10 +1148,12 @@ class RecentReversal:
         self,
         performance_metric="d_prime",
         sessions=["Goals" + str(i) for i in np.arange(1, 5)],
-        show_plot=True
+        show_plot=True,
     ):
         d_prime = self.plot_peak_performance_all_sessions(
-            performance_metric=performance_metric, sessions=sessions, show_plot=show_plot
+            performance_metric=performance_metric,
+            sessions=sessions,
+            show_plot=show_plot,
         )[0]
 
         df = self.performance_to_df(d_prime)[1]
@@ -4797,7 +4833,7 @@ class RecentReversal:
                 ax.annotate(mouse, (0.1, n[0] + 1))
 
             ax.set_ylabel(ylabel)
-            ax.set_ylim([0, 100]) #Hard coded for Denise's aesthetic preference.
+            ax.set_ylim([0, 100])  # Hard coded for Denise's aesthetic preference.
             plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
             fig.subplots_adjust(bottom=0.2)
 
@@ -8771,22 +8807,41 @@ class RecentReversal:
 
         return fig
 
-    def plot_degree_distribution(self, mouse, session, ensemble,
-                                 n_splits=6, method="fdr_bh", colors=["orange", "k", "limegreen"]):
-        G = self.make_graphs(self.xcorr_ensemble_cells(mouse, session, ensemble, n_splits=n_splits,
-                                                       show_plot=False), method=method)
-        degrees = np.asarray([d for n,d in G[-1].degree()])
+    def plot_degree_distribution(
+        self,
+        mouse,
+        session,
+        ensemble,
+        n_splits=6,
+        method="fdr_bh",
+        colors=["orange", "k", "limegreen"],
+    ):
+        G = self.make_graphs(
+            self.xcorr_ensemble_cells(
+                mouse, session, ensemble, n_splits=n_splits, show_plot=False
+            ),
+            method=method,
+        )
+        degrees = np.asarray([d for n, d in G[-1].degree()])
         percentiles = np.percentile(degrees, [0, 25, 50, 75, 100])
         percentiles[0] = percentiles[0] - 1
-        x = [degrees[np.logical_and(degrees > percentiles[0], degrees <= percentiles[1])],
-             degrees[np.logical_and(degrees > percentiles[1], degrees <= percentiles[-2])],
-             degrees[np.logical_and(degrees > percentiles[-2], degrees <= percentiles[-1])]]
+        x = [
+            degrees[
+                np.logical_and(degrees > percentiles[0], degrees <= percentiles[1])
+            ],
+            degrees[
+                np.logical_and(degrees > percentiles[1], degrees <= percentiles[-2])
+            ],
+            degrees[
+                np.logical_and(degrees > percentiles[-2], degrees <= percentiles[-1])
+            ],
+        ]
 
         fig, ax = plt.subplots()
         ax.hist(x, color=colors, rwidth=200)
         ax.set_ylabel("Number of neurons")
         ax.set_xlabel("Degrees")
-        [ax.spines[side].set_visible(False) for side in ['top', 'right']]
+        [ax.spines[side].set_visible(False) for side in ["top", "right"]]
         fig.tight_layout()
 
         return fig
@@ -9943,11 +9998,11 @@ class RecentReversal:
                 fig, axs = plt.subplots(1, len(session_types), figsize=(10, 7))
 
             cmap = matplotlib.cm.get_cmap()
-            cmap.set_bad(color='k')
+            cmap.set_bad(color="k")
             for ax, fields, ports, session in zip(
                 axs, ensemble_fields, port_locations_bins, session_labels
             ):
-                ax.imshow(fields[order][subset], cmap=cmap, interpolation='none')
+                ax.imshow(fields[order][subset], cmap=cmap, interpolation="none")
 
                 ax.axis("tight")
                 ax.set_title(session)
@@ -9955,7 +10010,7 @@ class RecentReversal:
                 ax.set_xticks(ax.get_xlim())
                 ax.set_xticklabels([0, 220])
 
-                ax.set_yticks([0, fields.shape[0]-1])
+                ax.set_yticks([0, fields.shape[0] - 1])
                 ax.set_yticklabels([1, fields.shape[0]])
                 # yticks = ax.get_yticks().tolist()
                 # yticks = [int(ytick + 1) for ytick in yticks]
@@ -10914,8 +10969,11 @@ class RecentReversal:
         if "A" in panels:
             anova_df = self.aged_performance_anova(show_plot=False)
             print(anova_df)
-            self.plot_peak_performance_all_sessions(performance_metric="d_prime", plot_line=True,
-                                                  sessions=["Goals"+str(i) for i in np.arange(1,5)])
+            self.plot_peak_performance_all_sessions(
+                performance_metric="d_prime",
+                plot_line=True,
+                sessions=["Goals" + str(i) for i in np.arange(1, 5)],
+            )
 
         if "B" in panels:
             performance_metric = "CRs"

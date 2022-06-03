@@ -10,10 +10,12 @@ from scipy.stats import zscore
 
 from ..CaImaging.Behavior import convert_dlc_to_eztrack
 from ..CaImaging.util import ScrollPlot, consecutive_dist, disp_frame
-from ..CircleTrack.BehaviorFunctions import (clean_lick_detection,
-                                             find_water_ports,
-                                             make_tracking_video,
-                                             sync_Arduino_outputs)
+from ..CircleTrack.BehaviorFunctions import (
+    clean_lick_detection,
+    find_water_ports,
+    make_tracking_video,
+    sync_Arduino_outputs,
+)
 
 
 class Preprocess:
@@ -90,8 +92,9 @@ class Preprocess:
             Distance (velocity)
 
         """
-        self.behavior_df["trials"], self.behavior_df['direction'] = \
-            get_trials(self.behavior_df.x)
+        self.behavior_df["trials"], self.behavior_df["direction"] = get_trials(
+            self.behavior_df.x
+        )
         self.behavior_df["distance"] = consecutive_dist(
             np.asarray((self.behavior_df.x, self.behavior_df.y)).T, zero_pad=True
         )
@@ -116,8 +119,7 @@ class Preprocess:
         self.behavior_df.to_csv(fpath, index=False)
 
     def final_save(self):
-        self.behavior_df = clean_lick_detection(self.behavior_df,
-                                                linear_track=True)
+        self.behavior_df = clean_lick_detection(self.behavior_df, linear_track=True)
 
         self.save()
 
@@ -126,9 +128,9 @@ class Preprocess:
         while any(jump_frames):
             self.correct_position(jump_frames[0])
 
-            jump_frames = np.where(
-                (self.behavior_df["distance"] > velocity_threshold))[
-                0]
+            jump_frames = np.where((self.behavior_df["distance"] > velocity_threshold))[
+                0
+            ]
 
             self.save()
 
@@ -242,7 +244,7 @@ class Preprocess:
         )
 
         # Plot.
-        self.traj_ax.plot(self.behavior_df['x'], alpha=0.5)
+        self.traj_ax.plot(self.behavior_df["x"], alpha=0.5)
         self.traj_ax.set_ylabel("Distance from center", color="b")
         self.dist_ax.plot(self.behavior_df["distance"], color="r", alpha=0.5)
         self.dist_ax.set_ylabel("Velocity", color="r", rotation=-90)
@@ -286,6 +288,7 @@ class Preprocess:
             self.folder, start=start, stop=stop, output_fname=fname, fps=fps
         )
 
+
 def get_trials(x, nbins=16):
     # Bin position.
     bins = np.linspace(min(x), max(x), nbins)
@@ -299,18 +302,16 @@ def get_trials(x, nbins=16):
     trials = np.full(binned_position.shape, np.nan)
     direction = np.full(binned_position.shape, np.nan, dtype=object)
 
-    trial_start = 0     # Trial starts on first frame.
+    trial_start = 0  # Trial starts on first frame.
 
     # Where is the mouse placed on the track? If closer to the left side,
     # the first trial ends when the mouse enters the rightmost bin.
-    start_i = {'left': 0,
-               'right': -2}
-    stop_i = {'left': -2,
-              'right': 0}
-    if bins[0] < nbins/2:
-        start_side = 'left'
+    start_i = {"left": 0, "right": -2}
+    stop_i = {"left": -2, "right": 0}
+    if bins[0] < nbins / 2:
+        start_side = "left"
     else:
-        start_side = 'right'
+        start_side = "right"
 
     # For a larg enumber of trials...
     for trial_number in range(500):
@@ -323,10 +324,10 @@ def get_trials(x, nbins=16):
         trial_end = stop_bin_frames[np.argmax(stop_bin_frames > enter_start)]
 
         # Switch sides.
-        if start_side == 'right':
-            start_side = 'left'
+        if start_side == "right":
+            start_side = "left"
         else:
-            start_side = 'right'
+            start_side = "right"
 
         # Assign the trial number.
         if np.all(np.isnan(trials[trial_start:trial_end])):
@@ -341,6 +342,7 @@ def get_trials(x, nbins=16):
         trial_start = trial_end
 
     return trials.astype(int), direction
+
 
 class BehaviorSession:
     def __init__(self, folder=None, pix_per_cm=6.3):
@@ -400,7 +402,7 @@ class BehaviorSession:
             self.meta["behavior_timestamps"] = pd.read_csv(
                 self.meta["paths"]["timestamps"], sep="\t"
             )
-        self.meta['local'] = False
+        self.meta["local"] = False
 
         self.meta["fps"] = self.get_fps()
 
@@ -416,11 +418,10 @@ class BehaviorSession:
         self.data["frames_per_trial"] = np.bincount(self.data["df"]["trials"])
 
         # Find water ports.
-        self.data["ports"], self.data["lin_ports"] = find_water_ports(self.data["df"],
-                                                                      linear_track=True,
-                                                                      use_licks=True)
+        self.data["ports"], self.data["lin_ports"] = find_water_ports(
+            self.data["df"], linear_track=True, use_licks=True
+        )
         self.data["n_drinks"] = self.count_drinks()
-
 
     def get_fps(self):
         """
@@ -476,9 +477,8 @@ class BehaviorSession:
         ax.set_ylabel("Licks")
 
 
-if __name__ == '__main__':
-    P = Preprocess(
-        r'Z:\Will\LinearTrack\Data\Miranda\2021_03_12_LinearTrack3\09_58_05')
-    #P.find_outliers()
+if __name__ == "__main__":
+    P = Preprocess(r"Z:\Will\LinearTrack\Data\Miranda\2021_03_12_LinearTrack3\09_58_05")
+    # P.find_outliers()
 
     pass

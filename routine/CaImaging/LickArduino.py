@@ -13,7 +13,8 @@ from util import find_closest
 # Change as needed to correspond to connected Arduino.
 # You can find the appropriate port with the Arduino IDE when you
 # have an Arduino connected to the USB.
-default_port = 'COM4'
+default_port = "COM4"
+
 
 def list_COMports():
     """
@@ -23,6 +24,7 @@ def list_COMports():
     ports = list(serial.tools.list_ports.comports())
     for port in ports:
         print(port)
+
 
 def initialize(com_port=default_port):
     """
@@ -50,13 +52,13 @@ def initialize(com_port=default_port):
     """
     # Connect to serial port. Make sure the baud rates match.
     ser = serial.Serial(com_port, 115200)
-    print(f'Arduino at {com_port} connected')
+    print(f"Arduino at {com_port} connected")
 
-    time.sleep(3)   # Necessary for Arudino reboot.
+    time.sleep(3)  # Necessary for Arudino reboot.
 
     # Send handshake signal to Arduino. Make sure this signal matches
     # the character that the Arduino is listening for.
-    ser.write('g'.encode())
+    ser.write("g".encode())
 
     # Arduino code should send a timestamp right after it receives
     # the above signal. Read it then extract Unix time.
@@ -65,8 +67,8 @@ def initialize(com_port=default_port):
 
     return ser, t, clock_t
 
-def read_Arduino(com_port=default_port,
-                 directory=r'D:\Projects\CircleTrack\SyncTest'):
+
+def read_Arduino(com_port=default_port, directory=r"D:\Projects\CircleTrack\SyncTest"):
     """
     Read Arduino serial writes and saves to a txt file continuously.
     Arduino must be plugged in or you will error.
@@ -90,12 +92,11 @@ def read_Arduino(com_port=default_port,
             # If there's incoming data, write line to txt file.
             if data:
                 timestamp = round((datetime.now() - clock_t).total_seconds() * 1000)
-                data_str = data.decode('utf-8')
-                port_and_frame = data_str.split('\r\n')[0]
-                data = (port_and_frame + ', ' +
-                     str(timestamp) + '\r\n').encode('utf-8')
+                data_str = data.decode("utf-8")
+                port_and_frame = data_str.split("\r\n")[0]
+                data = (port_and_frame + ", " + str(timestamp) + "\r\n").encode("utf-8")
 
-                with open(fname, 'ab+') as file:
+                with open(fname, "ab+") as file:
                     file.write(data)
 
     except:
@@ -104,9 +105,9 @@ def read_Arduino(com_port=default_port,
 
 def make_timestamp_fname(directory, clock_t, t):
     # File name building.
-    date_str = clock_t.strftime('%Y-%b-%d')
-    time_string = clock_t.strftime('H%H_M%M_S%S.%f')[:-2] + ' ' + t.decode('utf-8')[:-2]
-    fname = os.path.join(directory, date_str, time_string + '.txt')
+    date_str = clock_t.strftime("%Y-%b-%d")
+    time_string = clock_t.strftime("H%H_M%M_S%S.%f")[:-2] + " " + t.decode("utf-8")[:-2]
+    fname = os.path.join(directory, date_str, time_string + ".txt")
 
     # If directory doesn't exist, make it.
     if not os.path.isdir(os.path.join(directory, date_str)):
@@ -134,16 +135,16 @@ def clean_Arduino_output(fpath):
         Offset in milliseconds between Arduino and DAQ.
     """
     data = pd.read_csv(fpath, header=None)
-    data.columns = ['Data','Frame','Timestamp']
+    data.columns = ["Data", "Frame", "Timestamp"]
 
     # Sometimes there are NaNs. Correct them before converting
     # everything to integers.
     try:
-        data.astype({'Frame': int, 'Timestamp': int})
+        data.astype({"Frame": int, "Timestamp": int})
     except:
-        data.Frame = pd.to_numeric(data.Frame, errors='coerce')
+        data.Frame = pd.to_numeric(data.Frame, errors="coerce")
         bad_frames = np.where(~np.isfinite(data.Frame))[0]
-        print('Ignoring NaNs from these rows: ' + str(bad_frames))
+        print("Ignoring NaNs from these rows: " + str(bad_frames))
         data.dropna(inplace=True)
         data.reset_index(drop=True, inplace=True)
 
@@ -162,16 +163,15 @@ def clean_Arduino_output(fpath):
 
     # If the next frame number is negative, correct the rest.
     if inverted_sign_detected:
-        print('Negative frame numbers detected. They have been corrected.')
+        print("Negative frame numbers detected. They have been corrected.")
         frames = data.Frame.copy()
-        corrected_frames =  frames[frame_limit + 1:] + (32767*2)
-        data.loc[frame_limit + 1:, 'Frame'] = corrected_frames
+        corrected_frames = frames[frame_limit + 1 :] + (32767 * 2)
+        data.loc[frame_limit + 1 :, "Frame"] = corrected_frames
 
     # The Arduino also sometimes incorrectly writes the wrong timestamp.
     # If any huge spikes are detected, remove them.
-    ts_spikes = argrelextrema(np.asarray(data.Timestamp),
-                              np.greater, order=200)[0]
-    data.drop(index=ts_spikes, inplace=True)    # Drop spikes in the timestamps.
+    ts_spikes = argrelextrema(np.asarray(data.Timestamp), np.greater, order=200)[0]
+    data.drop(index=ts_spikes, inplace=True)  # Drop spikes in the timestamps.
     data.reset_index(drop=True, inplace=True)
 
     # Also grab the offset between Arduino and DAQ
@@ -180,8 +180,7 @@ def clean_Arduino_output(fpath):
     return data, offset
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     read_Arduino()
-    #folder = r'D:\Projects\CircleTrack\Mouse2\12_18_2019'
-    #fname = glob.glob(os.path.join(folder, 'H**_M**_S**.**** ****.txt'))[0]
+    # folder = r'D:\Projects\CircleTrack\Mouse2\12_18_2019'
+    # fname = glob.glob(os.path.join(folder, 'H**_M**_S**.**** ****.txt'))[0]

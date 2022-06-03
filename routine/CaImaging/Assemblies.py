@@ -1,9 +1,9 @@
-'''
+"""
 	Codes for PCA/ICA methods described in Detecting cell assemblies in large neuronal populations, Lopes-dos-Santos et al (2013).
 											https://doi.org/10.1016/j.jneumeth.2013.04.010
 	This implementation was written in Feb 2019.
 	Please e-mail me if you have comments, doubts, bug reports or criticism (Vítor, vtlsantos@gmail.com /  vitor.lopesdossantos@pharm.ox.ac.uk).
-'''
+"""
 
 import warnings
 from itertools import zip_longest
@@ -22,7 +22,7 @@ __author__ = "Vítor Lopes dos Santos"
 __version__ = "2019.1"
 
 
-def toyExample(assemblies, nneurons=10, nbins=1000, rate=1.):
+def toyExample(assemblies, nneurons=10, nbins=1000, rate=1.0):
     np.random.seed()
 
     actmat = np.random.poisson(rate, nneurons * nbins).reshape(nneurons, nbins)
@@ -34,8 +34,9 @@ def toyExample(assemblies, nneurons=10, nbins=1000, rate=1.):
 
         actbins = np.argsort(np.random.rand(nbins))[0:nact]
 
-        actmat[members.reshape(-1, 1), actbins] = \
+        actmat[members.reshape(-1, 1), actbins] = (
             np.ones((len(members), nact)) + actstrength_
+        )
 
         assemblies.actbins[ai] = np.sort(actbins)
 
@@ -43,7 +44,6 @@ def toyExample(assemblies, nneurons=10, nbins=1000, rate=1.):
 
 
 class toyassemblies:
-
     def __init__(self, membership, actrate, actstrength):
         self.membership = membership
         self.actrate = actrate
@@ -58,7 +58,7 @@ def marcenkopastur(significance):
     # calculates statistical threshold from Marcenko-Pastur distribution
     q = float(nbins) / float(nneurons)  # note that silent neurons are counted too
     lambdaMax = pow((1 + np.sqrt(1 / q)), 2)
-    lambdaMax += tracywidom * pow(nneurons, -2. / 3)  # Tracy-Widom correction
+    lambdaMax += tracywidom * pow(nneurons, -2.0 / 3)  # Tracy-Widom correction
 
     return lambdaMax
 
@@ -104,15 +104,15 @@ def circshuffling(zactmat, significance):
 
 
 def runSignificance(zactmat, significance):
-    if significance.nullhyp == 'mp':
+    if significance.nullhyp == "mp":
         lambdaMax = marcenkopastur(significance)
-    elif significance.nullhyp == 'bin':
+    elif significance.nullhyp == "bin":
         lambdaMax = binshuffling(zactmat, significance)
-    elif significance.nullhyp == 'circ':
+    elif significance.nullhyp == "circ":
         lambdaMax = circshuffling(zactmat, significance)
     else:
-        print('ERROR !')
-        print('    nyll hypothesis method ' + str(nullhyp) + ' not understood')
+        print("ERROR !")
+        print("    nyll hypothesis method " + str(nullhyp) + " not understood")
         significance.nassemblies = np.nan
 
     nassemblies = np.sum(significance.explained_variance_ > lambdaMax)
@@ -124,17 +124,18 @@ def runSignificance(zactmat, significance):
 def extractPatterns(actmat, significance, method):
     nassemblies = significance.nassemblies
 
-    if method == 'pca':
+    if method == "pca":
         idxs = np.argsort(-significance.explained_variance_)[0:nassemblies]
         patterns = significance.components_[idxs, :]
-    elif method == 'ica':
+    elif method == "ica":
         from sklearn.decomposition import FastICA
+
         ica = FastICA(n_components=nassemblies)
         ica.fit(actmat.T)
         patterns = ica.components_
     else:
-        print('ERROR !')
-        print('    assembly extraction method ' + str(method) + ' not understood')
+        print("ERROR !")
+        print("    assembly extraction method " + str(method) + " not understood")
         patterns = np.nan
 
     if patterns is not np.nan:
@@ -147,9 +148,10 @@ def extractPatterns(actmat, significance, method):
     return patterns
 
 
-def runPatterns(zactmat, method='ica', nullhyp='circ', nshu=1000,
-                percentile=99, tracywidom=False):
-    '''
+def runPatterns(
+    zactmat, method="ica", nullhyp="circ", nshu=1000, percentile=99, tracywidom=False
+):
+    """
     INPUTS
 
         zactmat:     activity matrix - numpy array (neurons, time bins)
@@ -175,15 +177,16 @@ def runPatterns(zactmat, method='ica', nullhyp='circ', nshu=1000,
         significance: object containing general information about significance tests
         zactmat:      returns zactmat
 
-    '''
+    """
 
     nneurons = np.size(zactmat, 0)
     nbins = np.size(zactmat, 1)
 
     silentneurons = np.var(zactmat, axis=1) == 0
     if any(silentneurons):
-        warnings.warn(f'Silent neurons detected: '
-                      f'{np.where(silentneurons)[0].tolist()}')
+        warnings.warn(
+            f"Silent neurons detected: " f"{np.where(silentneurons)[0].tolist()}"
+        )
     actmat_didspike = zactmat[~silentneurons, :]
 
     # # z-scoring activity matrix
@@ -208,8 +211,8 @@ def runPatterns(zactmat, method='ica', nullhyp='circ', nshu=1000,
         return
 
     if significance.nassemblies < 1:
-        print('WARNING !')
-        print('    no assembly detected!')
+        print("WARNING !")
+        print("    no assembly detected!")
         patterns = []
     else:
         # extracting co-activation patterns
@@ -223,7 +226,6 @@ def runPatterns(zactmat, method='ica', nullhyp='circ', nshu=1000,
         # zactmat = np.copy(actmat)
         # zactmat[~silentneurons, :] = actmat_didspike
 
-
     return patterns, significance, zactmat
 
 
@@ -236,16 +238,27 @@ def computeAssemblyActivity(patterns, zactmat, zerodiag=True):
         projMat = np.outer(pattern, pattern)
         projMat -= zerodiag * np.diag(np.diag(projMat))
         for bini in range(nbins):
-            assemblyAct[assemblyi, bini] = \
-                np.dot(np.dot(zactmat[:, bini], projMat), zactmat[:, bini])
+            assemblyAct[assemblyi, bini] = np.dot(
+                np.dot(zactmat[:, bini], projMat), zactmat[:, bini]
+            )
 
     return assemblyAct
 
+
 ################### Will's code starts here ##################
 
-def find_assemblies(neural_data, method='ica', nullhyp='mp',
-                    n_shuffles=1000, percentile=99, tracywidow=False,
-                    compute_activity=True, use_bool=False, plot=True):
+
+def find_assemblies(
+    neural_data,
+    method="ica",
+    nullhyp="mp",
+    n_shuffles=1000,
+    percentile=99,
+    tracywidow=False,
+    compute_activity=True,
+    use_bool=False,
+    plot=True,
+):
     """
     Gets patterns and assembly activations in one go.
 
@@ -276,22 +289,24 @@ def find_assemblies(neural_data, method='ica', nullhyp='mp',
         (n/a if nullhyp is NOT 'mp')
 
     """
-    spiking, _, bool_arr = get_transient_timestamps(neural_data,
-                                                    thresh_type='eps')
+    spiking, _, bool_arr = get_transient_timestamps(neural_data, thresh_type="eps")
     if use_bool:
         actmat = bool_arr
     else:
         actmat = stats.zscore(neural_data, axis=1)
 
     # Replace NaNs.
-    imp = SimpleImputer(missing_values=np.nan, strategy='constant',
-                            fill_value=0)
+    imp = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=0)
     actmat = imp.fit_transform(actmat.T).T
 
-    patterns, significance, z_data = \
-        runPatterns(actmat, method=method, nullhyp=nullhyp,
-                    nshu=n_shuffles, percentile=percentile,
-                    tracywidom=tracywidow)
+    patterns, significance, z_data = runPatterns(
+        actmat,
+        method=method,
+        nullhyp=nullhyp,
+        nshu=n_shuffles,
+        percentile=percentile,
+        tracywidom=tracywidow,
+    )
 
     if compute_activity:
         activations = computeAssemblyActivity(patterns, actmat)
@@ -302,12 +317,13 @@ def find_assemblies(neural_data, method='ica', nullhyp='mp',
     else:
         activations = None
 
-    assembly_dict = {'patterns':        patterns,
-                     'significance':    significance,
-                     'z_data':          z_data,
-                     'orig_data':       neural_data,
-                     'activations':     activations,
-                     }
+    assembly_dict = {
+        "patterns": patterns,
+        "significance": significance,
+        "z_data": z_data,
+        "orig_data": neural_data,
+        "activations": activations,
+    }
 
     return assembly_dict
 
@@ -336,11 +352,11 @@ def membership_sort(patterns, neural_data, sort_duplicates=True):
     return sorted_data, sorted_colors
 
 
-def preprocess_multiple_sessions(S_list, smooth_factor=0,
-                                 neurons=None, use_bool=True,
-                                 z_method='global'):
+def preprocess_multiple_sessions(
+    S_list, smooth_factor=0, neurons=None, use_bool=True, z_method="global"
+):
     # Store original data.
-    data = {'orig_S_list': S_list.copy()}
+    data = {"orig_S_list": S_list.copy()}
 
     # Keep certain neurons here. If None, keep all.
     if neurons is not None:
@@ -351,14 +367,13 @@ def preprocess_multiple_sessions(S_list, smooth_factor=0,
     for S in S_list:
         # Handle missing data.
         S = np.asarray(S, dtype=float)
-        imp = SimpleImputer(missing_values=np.nan, strategy='constant',
-                            fill_value=0)
+        imp = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=0)
         S = imp.fit_transform(S.T).T
 
         # Get spiking timestamps.
-        temp_s, temp_r, temp_bool = \
-            get_transient_timestamps(S, thresh_type='eps',
-                                     do_zscore=False)
+        temp_s, temp_r, temp_bool = get_transient_timestamps(
+            S, thresh_type="eps", do_zscore=False
+        )
         spike_times.append(temp_s)
         rates.append(temp_r)
         bool_arr_list.append(temp_bool)
@@ -367,37 +382,37 @@ def preprocess_multiple_sessions(S_list, smooth_factor=0,
 
     # Smooth if desired.
     if smooth_factor > 0:
-        S_list = [util.smooth_array(S, smooth_factor)
-                  for S in S_list]
-        bool_arr_list = [util.smooth_array(spikes, smooth_factor)
-                         for spikes in bool_arr_list]
+        S_list = [util.smooth_array(S, smooth_factor) for S in S_list]
+        bool_arr_list = [
+            util.smooth_array(spikes, smooth_factor) for spikes in bool_arr_list
+        ]
 
     # Make sure to z-score. Either globally or locally.
     # If global, take into account activity from all sessions that got
     # passed through this function. If local, just z-score within
     # session.
-    if z_method == 'global':
+    if z_method == "global":
         S_list = util.zscore_list(S_list)
         bool_arr_list = util.zscore_list(bool_arr_list)
 
-    elif z_method == 'local':
+    elif z_method == "local":
         S_list = [stats.zscore(S, axis=1) for S in S_list]
         bool_arr_list = [stats.zscore(spikes, axis=1) for spikes in bool_arr_list]
 
-    data['S'] = S_list
-    data['spike_times'] = spike_times
-    data['spike_rates'] = rates
-    data['bool_arrs'] = bool_arr_list
+    data["S"] = S_list
+    data["spike_times"] = spike_times
+    data["spike_rates"] = rates
+    data["bool_arrs"] = bool_arr_list
 
     if use_bool:
-        data['processed'] = bool_arr_list
+        data["processed"] = bool_arr_list
     else:
-        data['processed'] = S_list
+        data["processed"] = S_list
 
     return data
 
-def lapsed_activation(act_list, nullhyp='circ', n_shuffles=1000,
-                      percentile=99):
+
+def lapsed_activation(act_list, nullhyp="circ", n_shuffles=1000, percentile=99):
     """
     Computes activity of ensembles based on data from another day.
 
@@ -426,13 +441,12 @@ def lapsed_activation(act_list, nullhyp='circ', n_shuffles=1000,
         (n/a if nullhyp is 'mp')
     """
     # Get patterns.
-    patterns, significance, _= runPatterns(act_list[0],
-                                           nullhyp=nullhyp,
-                                           nshu=n_shuffles,
-                                           percentile=percentile)
+    patterns, significance, _ = runPatterns(
+        act_list[0], nullhyp=nullhyp, nshu=n_shuffles, percentile=percentile
+    )
 
     if significance.nassemblies < 1:
-        raise ValueError('No assemblies detected.')
+        raise ValueError("No assemblies detected.")
 
     # Find assembly activations for the template session then the lapsed ones.
     activations = []
@@ -440,9 +454,11 @@ def lapsed_activation(act_list, nullhyp='circ', n_shuffles=1000,
         # Get activations.
         activations.append(computeAssemblyActivity(patterns, actmat))
 
-    assemblies = {'activations': activations,
-                  'patterns': patterns,
-                  'significance': significance}
+    assemblies = {
+        "activations": activations,
+        "patterns": patterns,
+        "significance": significance,
+    }
 
     return assemblies
 
@@ -523,12 +539,12 @@ def plot_assemblies(assembly_act, spiking, do_zscore=True, colors=None):
     n_sessions = len(assembly_act)
     fig, axes = plt.subplots(n_sessions, 1)
     if n_sessions == 1:
-        axes = [axes]       # For iteration purposes.
+        axes = [axes]  # For iteration purposes.
 
     # For each session, plot each assembly.
-    for n, (ax, act, spikes, c) in \
-            enumerate(zip_longest(axes, assembly_act, spiking, colors,
-                                  fillvalue='k')):
+    for n, (ax, act, spikes, c) in enumerate(
+        zip_longest(axes, assembly_act, spiking, colors, fillvalue="k")
+    ):
         if do_zscore:
             act = stats.zscore(act, axis=1)
 
@@ -542,15 +558,15 @@ def plot_assemblies(assembly_act, spiking, do_zscore=True, colors=None):
         ax2.eventplot(spikes, colors=c)
         ax.set_ylim(bottom=0)
         ax2.set_ylim(bottom=0)
-        ax.set_ylabel('Ensemble activation [a.u.]')
-        ax.set_xlabel('Time [frame]')
-        ax2.set_ylabel('Neurons grouped by ensembles', rotation=-90)
+        ax.set_ylabel("Ensemble activation [a.u.]")
+        ax.set_xlabel("Time [frame]")
+        ax2.set_ylabel("Neurons grouped by ensembles", rotation=-90)
         ax2.set_yticks([0, len(spikes)])
 
     return fig, axes
 
 
-def get_important_neurons(patterns, mode='raw', n=10):
+def get_important_neurons(patterns, mode="raw", n=10):
     """
     Gets the most highly contributing neurons from each pattern.
 
@@ -571,8 +587,8 @@ def get_important_neurons(patterns, mode='raw', n=10):
         Neuron indices.
 
     """
-    if mode == 'percentile':
-        n = (100-n) * patterns.shape[1]
+    if mode == "percentile":
+        n = (100 - n) * patterns.shape[1]
 
     inds = []
     for pattern in np.abs(patterns):
@@ -580,7 +596,8 @@ def get_important_neurons(patterns, mode='raw', n=10):
 
     return inds
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # s1 = 0
     # s2 = 2
     # mouse = 'G132'
@@ -608,22 +625,16 @@ if __name__ == '__main__':
     # template = rearrange_neurons(map[:,0], [template])
     #
     # lapsed_activation(template[0], lapsed)
-    #find_assemblies(template[0])
+    # find_assemblies(template[0])
     # Make toy datasets.
-    toy = toyassemblies(membership=[[0, 1, 2, 3]],
-                        actrate=[0.05],
-                        actstrength=[10])
+    toy = toyassemblies(membership=[[0, 1, 2, 3]], actrate=[0.05], actstrength=[10])
     act1 = stats.zscore(toyExample(toy, nbins=500), axis=1)
 
-    toy = toyassemblies(membership=[[6, 7, 8, 9]],
-                        actrate=[0.05],
-                        actstrength=[10])
+    toy = toyassemblies(membership=[[6, 7, 8, 9]], actrate=[0.05], actstrength=[10])
     act2 = stats.zscore(toyExample(toy, nbins=500), axis=1)
     acts = [act1, act2]
 
-    toy = toyassemblies(membership=[[2, 3, 4, 5]],
-                        actrate=[0.05],
-                        actstrength=[10])
+    toy = toyassemblies(membership=[[2, 3, 4, 5]], actrate=[0.05], actstrength=[10])
     act3 = stats.zscore(toyExample(toy, nbins=500), axis=1)
     acts = [act1, act2, act3]
 
@@ -635,16 +646,14 @@ if __name__ == '__main__':
     for act in acts:
         assemblyActs.append(computeAssemblyActivity(patterns, act))
 
-    fig, axs = plt.subplots(len(acts), 2, sharey='col')
-    for act, assemblyAct, ax in zip(acts,
-                                    assemblyActs,
-                                    axs):
+    fig, axs = plt.subplots(len(acts), 2, sharey="col")
+    for act, assemblyAct, ax in zip(acts, assemblyActs, axs):
         # Spikes and ensemble activation.
-        ax[0].plot(assemblyAct.T, color='b', alpha=0.3)
-        ax[0].set_ylabel('Activation strength')
+        ax[0].plot(assemblyAct.T, color="b", alpha=0.3)
+        ax[0].set_ylabel("Activation strength")
         spike_ax = ax[0].twinx()
-        spks = spike_ax.imshow(act, cmap='Reds')
-        spike_ax.axis('tight')
+        spks = spike_ax.imshow(act, cmap="Reds")
+        spike_ax.axis("tight")
         ax[0].set_zorder(spike_ax.get_zorder() + 1)
         ax[0].patch.set_visible(False)
 
@@ -654,5 +663,5 @@ if __name__ == '__main__':
         fig.colorbar(r, ax=ax[1])
 
     plt.tight_layout()
-    axs[0,1].set_title('Correlations')
+    axs[0, 1].set_title("Correlations")
     plt.show()

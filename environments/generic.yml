@@ -256,3 +256,4 @@ dependencies:
   - pyqt5-sip=4.19.18
   - charset-normalizer=2.0.12
   - zfp=0.5.5
+  - black

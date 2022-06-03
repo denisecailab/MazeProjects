@@ -1,13 +1,14 @@
 import os
 import pickle as pkl
 import tkinter as tk
+from tkinter import filedialog
+
+import pandas as pd
 
 from CaImaging.util import get_data_paths, search_for_folders
 
 tkroot = tk.Tk()
 tkroot.withdraw()
-from tkinter import filedialog
-import pandas as pd
 
 
 def make_pattern_dict():
@@ -66,14 +67,13 @@ def find_timestamp_file(timestamp_paths, camera_type):
 
     """
     n_paths = len(timestamp_paths)
-    assert n_paths == 2, f'Unusual number of paths entered: {n_paths}'
-    assert camera_type in ['BehavCam', 'Miniscope'], 'Unusual camera type entered'
+    assert n_paths == 2, f"Unusual number of paths entered: {n_paths}"
+    assert camera_type in ["BehavCam", "Miniscope"], "Unusual camera type entered"
 
-    files = [path for path in timestamp_paths if
-             camera_type in path]
+    files = [path for path in timestamp_paths if camera_type in path]
 
     n_files_found = len(files)
-    assert n_files_found==1, f'Unusual number of paths found: {n_files_found}'
+    assert n_files_found == 1, f"Unusual number of paths found: {n_files_found}"
 
     return files[0]
 

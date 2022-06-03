@@ -26,17 +26,12 @@ session_types = {
         "CircleTrackRecall",
     ],
     "RemoteReversal": ["Goals1", "Goals2", "Goals3", "Goals4", "Reversal"],
-    "PSAM_Pilot": ["Training" + str(i) for i in np.arange(1,6)],
+    "PSAM_Pilot": ["Training" + str(i) for i in np.arange(1, 6)],
 }
 
 # Exclude PSAM4, PSAM5, and PSAM15 because they never learned
 # (poor Goals4 performance).
-PSEM_mice = ['PSAM_7',
-             'PSAM_10',
-             'PSAM_12',
-             'PSAM_13',
-             'PSAM_15',
-             'PSAM_16']
+PSEM_mice = ["PSAM_7", "PSAM_10", "PSAM_12", "PSAM_13", "PSAM_15", "PSAM_16"]
 
 aged_mice = [
     "Gemini",
@@ -54,17 +49,17 @@ aged_mice = [
 ages = ["young", "aged"]
 PSAM_groups = ["vehicle", "PSEM"]
 age_colors = ["cornflowerblue", "r"]
-PSAM_colors = ['silver', 'mediumpurple']
+PSAM_colors = ["silver", "mediumpurple"]
+
 
 class PSAM:
     def __init__(self, mice):
-        self.data = MultiAnimal(mice, project_name='PSAM_Pilot',
-                                SessionFunction=BehaviorSession)
-
-
+        self.data = MultiAnimal(
+            mice, project_name="PSAM_Pilot", SessionFunction=BehaviorSession
+        )
 
         self.meta = {
-            "session_types": session_types['PSAM_Pilot'],
+            "session_types": session_types["PSAM_Pilot"],
             "mice": mice,
         }
 
@@ -78,13 +73,13 @@ class PSAM:
         }
 
     def plot_all_behavior(
-            self,
-            window=6,
-            strides=2,
-            ax=None,
-            performance_metric="d_prime",
-            show_plot=True,
-            trial_limit=None,
+        self,
+        window=6,
+        strides=2,
+        ax=None,
+        performance_metric="d_prime",
+        show_plot=True,
+        trial_limit=None,
     ):
         # Preallocate array.
         behavioral_performance_arr = np.zeros(
@@ -125,8 +120,8 @@ class PSAM:
                 [
                     len(i)
                     for i in behavioral_performance.sel(
-                    metric="d_prime", session=session
-                ).values.tolist()
+                        metric="d_prime", session=session
+                    ).values.tolist()
                 ]
             )
             for session in self.meta["session_types"]
@@ -184,7 +179,7 @@ class PSAM:
                 for inj, c in zip(PSAM_groups, PSAM_colors):
                     ax.plot(metrics[inj].T, color=c, alpha=0.3)
                     ax.errorbar(
-                        self.meta['session_labels'],
+                        self.meta["session_labels"],
                         np.nanmean(metrics[inj], axis=0),
                         sem(metrics[inj], axis=0),
                         color=c,
@@ -196,21 +191,34 @@ class PSAM:
             fig.legend()
 
         if window is None:
-            mice_ = np.hstack([np.repeat(self.meta['grouped_mice'][inj],
-                                         len(self.meta['session_types']))
-                               for inj in PSAM_groups])
-            groups_ = np.hstack([np.repeat(inj, metrics[inj].size) for inj in PSAM_groups])
-            session_types_ = np.hstack([np.tile(self.meta['session_types'],
-                                                len(self.meta['grouped_mice'][inj]))
-                                        for inj in PSAM_groups])
+            mice_ = np.hstack(
+                [
+                    np.repeat(
+                        self.meta["grouped_mice"][inj], len(self.meta["session_types"])
+                    )
+                    for inj in PSAM_groups
+                ]
+            )
+            groups_ = np.hstack(
+                [np.repeat(inj, metrics[inj].size) for inj in PSAM_groups]
+            )
+            session_types_ = np.hstack(
+                [
+                    np.tile(
+                        self.meta["session_types"], len(self.meta["grouped_mice"][inj])
+                    )
+                    for inj in PSAM_groups
+                ]
+            )
             metric_ = np.hstack([metrics[inj].flatten() for inj in PSAM_groups])
 
             df = pd.DataFrame(
-                {'metric': metric_,
-                 'session_types': session_types_,
-                 'mice': mice_,
-                 'group': groups_,
-                 }
+                {
+                    "metric": metric_,
+                    "session_types": session_types_,
+                    "mice": mice_,
+                    "group": groups_,
+                }
             )
         else:
             df = None
@@ -218,13 +226,13 @@ class PSAM:
         return behavioral_performance, metrics, df
 
     def plot_best_performance(
-            self,
-            session_type,
-            ax=None,
-            window=None,
-            performance_metric="d_prime",
-            show_plot=True,
-            downsample_trials=False,
+        self,
+        session_type,
+        ax=None,
+        window=None,
+        performance_metric="d_prime",
+        show_plot=True,
+        downsample_trials=False,
     ):
         if downsample_trials:
             trial_limit = min(
@@ -270,17 +278,17 @@ class PSAM:
                 zorder=0,
             )
 
-            [ax.scatter(
-                jitter_x(np.ones_like(best_performance[inj])*(i+1), 0.1),
-                best_performance[inj],
-                color=color,
-                edgecolor='k',
-                zorder=1,
-            )
-                for i, (inj, color) in enumerate(zip(PSAM_groups, PSAM_colors))]
-            for patch, med, color in zip(
-                    box["boxes"], box["medians"], PSAM_colors
-            ):
+            [
+                ax.scatter(
+                    jitter_x(np.ones_like(best_performance[inj]) * (i + 1), 0.1),
+                    best_performance[inj],
+                    color=color,
+                    edgecolor="k",
+                    zorder=1,
+                )
+                for i, (inj, color) in enumerate(zip(PSAM_groups, PSAM_colors))
+            ]
+            for patch, med, color in zip(box["boxes"], box["medians"], PSAM_colors):
                 patch.set_facecolor(color)
                 med.set(color="k")
 
@@ -294,17 +302,19 @@ class PSAM:
         return best_performance
 
     def plot_best_performance_all_sessions(
-            self,
-            window=None,
-            performance_metric="CRs",
-            downsample_trials=False,
-            sessions=None,
+        self,
+        window=None,
+        performance_metric="CRs",
+        downsample_trials=False,
+        sessions=None,
     ):
         if sessions is None:
-            sessions = self.meta['session_types']
+            sessions = self.meta["session_types"]
 
-        session_labels = [self.meta['session_labels'][self.meta['session_types'].index(session)]
-                          for session in sessions]
+        session_labels = [
+            self.meta["session_labels"][self.meta["session_types"].index(session)]
+            for session in sessions
+        ]
         fig, axs = plt.subplots(1, len(sessions), sharey=True)
         fig.subplots_adjust(wspace=0)
         ylabels = {
@@ -313,9 +323,7 @@ class PSAM:
             "hits": "Hit rate",
         }
         performance = dict()
-        for ax, session, title in zip(
-                axs, sessions, session_labels
-        ):
+        for ax, session, title in zip(axs, sessions, session_labels):
             performance[session] = self.plot_best_performance(
                 session_type=session,
                 ax=ax,
@@ -335,58 +343,68 @@ class PSAM:
 
         return performance
 
-
-    def scatter_box(self, data, ylabel='', ax=None):
+    def scatter_box(self, data, ylabel="", ax=None):
         if ax is None:
             fig, ax = plt.subplots()
-        boxes = ax.boxplot([data[inj] for inj in PSAM_groups],
-                           widths=0.75, showfliers=False, zorder=0, patch_artist=True)
-
-        [ax.scatter(
-            jitter_x(np.ones_like(data[inj])*(i+1), 0.05),
-            data[inj],
-            color=color,
-            edgecolor='k',
-            zorder=1,
-            s=50,
+        boxes = ax.boxplot(
+            [data[inj] for inj in PSAM_groups],
+            widths=0.75,
+            showfliers=False,
+            zorder=0,
+            patch_artist=True,
         )
-            for i, (inj, color) in enumerate(zip(PSAM_groups,
-                                                 PSAM_colors))]
 
-        for patch, med, color in zip(
-                boxes["boxes"], boxes["medians"], PSAM_colors
-        ):
+        [
+            ax.scatter(
+                jitter_x(np.ones_like(data[inj]) * (i + 1), 0.05),
+                data[inj],
+                color=color,
+                edgecolor="k",
+                zorder=1,
+                s=50,
+            )
+            for i, (inj, color) in enumerate(zip(PSAM_groups, PSAM_colors))
+        ]
+
+        for patch, med, color in zip(boxes["boxes"], boxes["medians"], PSAM_colors):
             patch.set_facecolor(color)
             med.set(color="k")
         ax.set_xticks([])
         ax.set_ylabel(ylabel)
 
     def compare_trial_count(self, session_type):
-        trials = {inj: [self.data[mouse][session_type].data['ntrials']
-                        for mouse in self.meta['grouped_mice'][inj]]
-                  for inj in PSAM_groups}
+        trials = {
+            inj: [
+                self.data[mouse][session_type].data["ntrials"]
+                for mouse in self.meta["grouped_mice"][inj]
+            ]
+            for inj in PSAM_groups
+        }
 
-        self.scatter_box(trials, 'Trials')
+        self.scatter_box(trials, "Trials")
 
         return trials
 
     def compare_licks(self, session_type, exclude_rewarded=False):
         licks = {inj: [] for inj in PSAM_groups}
         for inj in PSAM_groups:
-            for mouse in self.meta['grouped_mice'][inj]:
+            for mouse in self.meta["grouped_mice"][inj]:
                 if exclude_rewarded:
-                    ports = ~self.data[mouse][session_type].data['rewarded_ports']
+                    ports = ~self.data[mouse][session_type].data["rewarded_ports"]
                 else:
-                    ports = np.ones_like(self.data[mouse][session_type].data['rewarded_ports'],
-                                         dtype=bool)
-                licks[inj].append(np.sum(self.data[mouse]
-                                         [session_type].data['all_licks'][:,ports]))
+                    ports = np.ones_like(
+                        self.data[mouse][session_type].data["rewarded_ports"],
+                        dtype=bool,
+                    )
+                licks[inj].append(
+                    np.sum(self.data[mouse][session_type].data["all_licks"][:, ports])
+                )
 
-        self.scatter_box(licks, ylabel='Licks')
+        self.scatter_box(licks, ylabel="Licks")
 
         return licks
 
 
-if __name__ == '__main__':
-    mice = ['PSAM_' + str(i) for i in np.arange(7,18)]
+if __name__ == "__main__":
+    mice = ["PSAM_" + str(i) for i in np.arange(7, 18)]
     P = PSAM(mice)

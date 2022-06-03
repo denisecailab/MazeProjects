@@ -5,17 +5,21 @@ from MiniscopeFunctions import CalciumSession
 from sql import Database
 
 from ..CaImaging.CellReg import CellRegObj
-from ..LinearTrack.BehaviorFunctions import \
-    BehaviorSession as LTBehaviorSession
+from ..LinearTrack.BehaviorFunctions import BehaviorSession as LTBehaviorSession
 
-directory = r'D:'
-db_fname = 'database.sqlite'
+directory = r"D:"
+db_fname = "database.sqlite"
 
-def MultiSession(mouse, project_name='Drift',
-                 directory=directory, db_fname=db_fname,
-                 SessionFunction=CalciumSession,
-                 session_types=None,
-                 **kwargs):
+
+def MultiSession(
+    mouse,
+    project_name="Drift",
+    directory=directory,
+    db_fname=db_fname,
+    SessionFunction=CalciumSession,
+    session_types=None,
+    **kwargs,
+):
 
     db = Database(directory, db_fname)
     sql_str = """
@@ -48,7 +52,9 @@ def MultiSession(mouse, project_name='Drift',
     results = db.execute(sql_str, (project_name,))
 
     if SessionFunction not in [BehaviorSession, LTBehaviorSession]:
-        cellreg_path = os.path.join(results[0][0], mouse, 'SpatialFootprints', 'CellRegResults')
+        cellreg_path = os.path.join(
+            results[0][0], mouse, "SpatialFootprints", "CellRegResults"
+        )
         try:
             S["CellReg"] = CellRegObj(cellreg_path)
         except:
@@ -57,15 +63,16 @@ def MultiSession(mouse, project_name='Drift',
     return S
 
 
-def MultiAnimal(mice, project_name='Drift',
-                SessionFunction=CalciumSession,
-                session_types=None):
+def MultiAnimal(
+    mice, project_name="Drift", SessionFunction=CalciumSession, session_types=None
+):
     sessions_by_mouse = dict()
 
     for mouse in mice:
         print(f"Loading data from {mouse}")
         sessions_by_mouse[mouse] = MultiSession(
-            mouse, project_name=project_name,
+            mouse,
+            project_name=project_name,
             SessionFunction=SessionFunction,
             session_types=session_types,
         )
@@ -73,5 +80,5 @@ def MultiAnimal(mice, project_name='Drift',
     return sessions_by_mouse
 
 
-if __name__ == '__main__':
-    MultiSession('Io', 'Drift')
+if __name__ == "__main__":
+    MultiSession("Io", "Drift")

@@ -18,7 +18,7 @@ def plot_assembly(
     ax=None,
     frames=None,
     activation_color="m",
-    spike_colors='k',
+    spike_colors="k",
 ):
     """
     Plots single assemblies. This plot contains the activation profile (activation over time)
@@ -85,7 +85,9 @@ def plot_assembly(
         "Activation strength (a.u.)", color=activation_color, fontsize=22
     )
     activation_ax.set_xlabel("Time (s)", fontsize=22)
-    spikes_ax.eventplot(sorted_spike_times, color=spike_colors, alpha=0.2, rasterized=True)
+    spikes_ax.eventplot(
+        sorted_spike_times, color=spike_colors, alpha=0.2, rasterized=True
+    )
     spikes_ax.set_ylabel("Neurons", rotation=-90, fontsize=22)
     spikes_ax.set_yticks([0, len(sorted_spike_times)])
 

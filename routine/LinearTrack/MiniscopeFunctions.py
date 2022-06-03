@@ -8,8 +8,7 @@ from BehaviorFunctions import BehaviorSession
 from plotting import plot_directional_raster, plot_raster
 
 from ..CaImaging.Behavior import spatial_bin
-from ..CaImaging.Miniscope import (get_transient_timestamps,
-                                   nan_corrupted_frames)
+from ..CaImaging.Miniscope import get_transient_timestamps, nan_corrupted_frames
 from ..CaImaging.PlaceFields import PlaceFields
 from ..CaImaging.util import ScrollPlot, nan_array
 from ..CircleTrack.utils import get_equivalent_local_path, sync
@@ -18,18 +17,18 @@ from ..util import Session_Metadata
 
 class CalciumSession:
     def __init__(
-            self,
-            session_folder,
-            spatial_bin_size=1.905, # ~1.905 cm for 50 bins, use None
-            nbins=None,
-            S_std_thresh=1,
-            velocity_threshold=4,
-            place_cell_alpha=0.001,
-            place_cell_transient_threshold='n_trials',
-            overwrite_synced_data=False,
-            overwrite_placefields=False,
-            overwrite_placefield_trials=False,
-            local=True,
+        self,
+        session_folder,
+        spatial_bin_size=1.905,  # ~1.905 cm for 50 bins, use None
+        nbins=None,
+        S_std_thresh=1,
+        velocity_threshold=4,
+        place_cell_alpha=0.001,
+        place_cell_transient_threshold="n_trials",
+        overwrite_synced_data=False,
+        overwrite_placefields=False,
+        overwrite_placefield_trials=False,
+        local=True,
     ):
         """
         Single session analyses and plots for miniscope data.
@@ -61,8 +60,7 @@ class CalciumSession:
 
             self.meta["paths"] = self.behavior.meta["paths"]
         except:
-            self.behavior = BehaviorSession(self.meta["folder"],
-                                            pix_per_cm=6.3)
+            self.behavior = BehaviorSession(self.meta["folder"], pix_per_cm=6.3)
 
             # Get paths
             self.meta["paths"] = self.behavior.meta["paths"]
@@ -74,8 +72,9 @@ class CalciumSession:
             # Combine behavioral and calcium imaging data.
             self.behavior.data["df"], self.imaging = sync(
                 self.meta["paths"]["minian"],
-                self.behavior.data["df"], timestamp_paths,
-                convert_to_np=False
+                self.behavior.data["df"],
+                timestamp_paths,
+                convert_to_np=False,
             )
 
             self.imaging["C"], self.imaging["S"] = self.nan_bad_frames()
@@ -112,7 +111,7 @@ class CalciumSession:
                 self.spatial.meta["bin_size"] == spatial_bin_size,
                 self.spatial.meta["nbins"] == nbins,
                 self.spatial.meta["velocity_threshold"] == velocity_threshold,
-                ]
+            ]
 
             if not all(parameters_match):
                 print("A placefield parameter does not match saved data, rerunning.")
@@ -125,8 +124,8 @@ class CalciumSession:
                 np.asarray(self.behavior.data["df"]["x"]),
                 np.zeros_like(self.behavior.data["df"]["x"]),
                 self.imaging["S"],
-                bin_size=self.meta['spatial_bin_size'],
-                nbins=self.meta['nbins'],
+                bin_size=self.meta["spatial_bin_size"],
+                nbins=self.meta["nbins"],
                 circular=False,
                 linearized=True,
                 fps=self.behavior.meta["fps"],
@@ -165,12 +164,15 @@ class CalciumSession:
                     file,
                 )
 
-        if place_cell_transient_threshold == 'n_trials':
-            place_cell_transient_threshold = self.behavior.data['ntrials']
-        self.spatial.data['place_cells'] = self.get_place_cells(alpha=place_cell_alpha,
-                                                                transient_threshold=place_cell_transient_threshold)
-        self.spatial.meta['place_cell_pval'] = place_cell_alpha
-        self.spatial.meta['place_cell_transient_threshold'] = place_cell_transient_threshold
+        if place_cell_transient_threshold == "n_trials":
+            place_cell_transient_threshold = self.behavior.data["ntrials"]
+        self.spatial.data["place_cells"] = self.get_place_cells(
+            alpha=place_cell_alpha, transient_threshold=place_cell_transient_threshold
+        )
+        self.spatial.meta["place_cell_pval"] = place_cell_alpha
+        self.spatial.meta[
+            "place_cell_transient_threshold"
+        ] = place_cell_transient_threshold
 
     def get_pkl_path(self, fname):
         if self.meta["local"]:
@@ -208,7 +210,7 @@ class CalciumSession:
         running = self.spatial.data["running"]
         filler = np.zeros_like(lin_position)
         if nbins is None:
-            nbins = self.meta['nbins']
+            nbins = self.meta["nbins"]
         bin_edges = spatial_bin(
             lin_position,
             filler,
@@ -236,8 +238,11 @@ class CalciumSession:
 
             # Get occupancy this trial.
             occupancy = spatial_bin(
-                positions_this_trial, filler, bins=bin_edges, one_dim=True,
-                weights=running_this_trial.astype(int)
+                positions_this_trial,
+                filler,
+                bins=bin_edges,
+                one_dim=True,
+                weights=running_this_trial.astype(int),
             )[0]
 
             # Weight position by activity of each neuron.
@@ -258,9 +263,13 @@ class CalciumSession:
 
     def get_place_cells(self, alpha=0.001, transient_threshold=40):
         # Total number of transients across all laps for each spatial bin.
-        n_transients = np.sum(np.sum(self.spatial.data['rasters'], axis=1), axis=1)
-        place_cells = np.where(np.logical_and(self.spatial.data['spatial_info_pvals'] < alpha,
-                                              n_transients> transient_threshold))[0]
+        n_transients = np.sum(np.sum(self.spatial.data["rasters"], axis=1), axis=1)
+        place_cells = np.where(
+            np.logical_and(
+                self.spatial.data["spatial_info_pvals"] < alpha,
+                n_transients > transient_threshold,
+            )
+        )[0]
 
         return place_cells
 
@@ -297,9 +306,11 @@ class CalciumSession:
 
         split_rasters = {}
         tuning_curves = {}
-        for direction in ['left','right']:
-            xward_trials = np.unique(trials[directions==direction])
-            split_rasters[direction] = nan_array((len(neurons), len(xward_trials), rasters.shape[2]))
+        for direction in ["left", "right"]:
+            xward_trials = np.unique(trials[directions == direction])
+            split_rasters[direction] = nan_array(
+                (len(neurons), len(xward_trials), rasters.shape[2])
+            )
             tuning_curves[direction] = nan_array((len(neurons), rasters.shape[2]))
 
             for i, raster in enumerate(rasters):

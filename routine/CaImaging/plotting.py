@@ -57,19 +57,21 @@ def jitter_x(arr, jitter=0.05):
 
     return jittered
 
+
 def beautify_ax(ax):
-    ax.tick_params(right="off",top="off",length = 4, width = 1, direction = "out")
-    [ax.spines[side].set_visible(False) for side in ['top', 'right']]
-    ax.yaxis.set_ticks_position('left')
-    ax.xaxis.set_ticks_position('bottom')
-    for line in ["left","bottom"]:
+    ax.tick_params(right="off", top="off", length=4, width=1, direction="out")
+    [ax.spines[side].set_visible(False) for side in ["top", "right"]]
+    ax.yaxis.set_ticks_position("left")
+    ax.xaxis.set_ticks_position("bottom")
+    for line in ["left", "bottom"]:
         ax.spines[line].set_linewidth(2)
-        ax.spines[line].set_position(("outward",10))
+        ax.spines[line].set_position(("outward", 10))
 
     return ax
 
-def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-    '''
+
+def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name="shiftedcmap"):
+    """
     Function to offset the "center" of a colormap. Useful for
     data with a negative min and positive max and you want the
     middle of the colormap's dynamic range to be at zero.
@@ -89,35 +91,33 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
       stop : Offset from highest point in the colormap's range.
           Defaults to 1.0 (no upper offset). Should be between
           `midpoint` and 1.0.
-    '''
-    cdict = {
-        'red': [],
-        'green': [],
-        'blue': [],
-        'alpha': []
-    }
+    """
+    cdict = {"red": [], "green": [], "blue": [], "alpha": []}
 
     # regular index to compute the colors
     reg_index = np.linspace(start, stop, 257)
 
     # shifted index to match the data
-    shift_index = np.hstack([
-        np.linspace(0.0, midpoint, 128, endpoint=False),
-        np.linspace(midpoint, 1.0, 129, endpoint=True)
-    ])
+    shift_index = np.hstack(
+        [
+            np.linspace(0.0, midpoint, 128, endpoint=False),
+            np.linspace(midpoint, 1.0, 129, endpoint=True),
+        ]
+    )
 
     for ri, si in zip(reg_index, shift_index):
         r, g, b, a = cmap(ri)
 
-        cdict['red'].append((si, r, r))
-        cdict['green'].append((si, g, g))
-        cdict['blue'].append((si, b, b))
-        cdict['alpha'].append((si, a, a))
+        cdict["red"].append((si, r, r))
+        cdict["green"].append((si, g, g))
+        cdict["blue"].append((si, b, b))
+        cdict["alpha"].append((si, a, a))
 
     newcmap = matplotlib.colors.LinearSegmentedColormap(name, cdict)
     plt.register_cmap(cmap=newcmap)
 
     return newcmap
+
 
 def plot_xy_line(ax):
     lims = [
@@ -126,4 +126,4 @@ def plot_xy_line(ax):
     ]
 
     # now plot both limits against eachother
-    ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
+    ax.plot(lims, lims, "k-", alpha=0.75, zorder=0)

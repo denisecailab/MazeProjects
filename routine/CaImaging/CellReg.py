@@ -78,7 +78,7 @@ class SpatialFootprints:
 
             # Save.
             matfiledata = {}
-            matfiledata[u'footprints'] = footprints
+            matfiledata["footprints"] = footprints
             hdf5storage.writes(mdict=matfiledata, filename=Path(fname))
             print(f"Saved {fname}")
 
@@ -116,7 +116,9 @@ class CellRegObj:
 
         # Based on comments from Y.Z. and D.M., CellReg sorts the sessions, so
         # we must also sort.
-        sessions = natsorted([os.path.split(os.path.splitext(i)[0])[-1] for i in mat_files])
+        sessions = natsorted(
+            [os.path.split(os.path.splitext(i)[0])[-1] for i in mat_files]
+        )
 
         return sessions
 
@@ -330,7 +332,9 @@ def rearrange_neurons(cell_map, neural_data):
         rearranged = []
         if spike_list:
             for n, single_session_activity in enumerate(neural_data):
-                rearranged.append([single_session_activity[neuron] for neuron in cell_map[:, n]])
+                rearranged.append(
+                    [single_session_activity[neuron] for neuron in cell_map[:, n]]
+                )
         else:
             for n, single_session_activity in enumerate(neural_data):
                 rearranged.append(single_session_activity[cell_map[:, n]])
@@ -353,7 +357,9 @@ def rearrange_neurons(cell_map, neural_data):
         else:
             for n, single_session_activity in enumerate(neural_data):
                 # Assume neuron is not active, fill with zeros.
-                rearranged_session = nan_array((cell_map.shape[0], single_session_activity.shape[1]))
+                rearranged_session = nan_array(
+                    (cell_map.shape[0], single_session_activity.shape[1])
+                )
 
                 # Be sure to only grab neurons if cell_map value is > -1.
                 # Otherwise, it will take the last neuron (-1).
@@ -365,6 +371,7 @@ def rearrange_neurons(cell_map, neural_data):
                 rearranged.append(rearranged_session)
 
     return rearranged
+
 
 # DEPRECATED.
 def get_cellreg_path(cell_map, mouse, animal_key="Mouse", cellreg_key="CellRegPath"):
@@ -434,7 +441,7 @@ if __name__ == "__main__":
     # )
 
     # CellRegObj(r'Z:\Will\Drift\Data\Encedalus_Scope14\SpatialFootprints\CellRegResults')
-    S = SpatialFootprints(r'Z:\Will\Drift\Data\Castor_Scope05')
+    S = SpatialFootprints(r"Z:\Will\Drift\Data\Castor_Scope05")
     S.session_paths = S.session_paths[2:]
     # S.session_numbers = [folder.parts[-3] for folder in
     #                      S.session_paths]

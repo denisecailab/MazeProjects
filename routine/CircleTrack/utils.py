@@ -16,8 +16,14 @@ from sklearn.naive_bayes import BernoulliNB
 from tqdm import tqdm
 
 from ..CaImaging.PlaceFields import spatial_bin
-from ..CaImaging.util import (concat_avis, find_closest, make_bins,
-                              search_for_files, search_for_folders, sync_data)
+from ..CaImaging.util import (
+    concat_avis,
+    find_closest,
+    make_bins,
+    search_for_files,
+    search_for_folders,
+    sync_data,
+)
 
 tkroot = tk.Tk()
 tkroot.withdraw()
@@ -918,11 +924,11 @@ def get_circular_error(y_predicted, y_real, n_spatial_bins):
 
 
 def format_spatial_location_for_decoder(
-        lin_position,
-        n_spatial_bins=36,
-        time_bin_size=1,
-        fps=15,
-        classifier=BernoulliNB(),
+    lin_position,
+    n_spatial_bins=36,
+    time_bin_size=1,
+    fps=15,
+    classifier=BernoulliNB(),
 ):
     """
     Naive Bayes classifiers only take integers as outcomes.
@@ -963,7 +969,10 @@ def format_spatial_location_for_decoder(
 
     return position
 
-def find_reward_spatial_bins(lin_position, port_locations, spatial_bin_size_radians=0.05):
+
+def find_reward_spatial_bins(
+    lin_position, port_locations, spatial_bin_size_radians=0.05
+):
     bins = spatial_bin(
         lin_position,
         np.zeros_like(lin_position),
@@ -975,8 +984,9 @@ def find_reward_spatial_bins(lin_position, port_locations, spatial_bin_size_radi
 
     return reward_locations_bins, bins
 
+
 def replace_LEDoff_frames(fpath, replacement_frame_number=4):
-    folder = os.path.join(os.path.split(fpath)[0], 'originals')
+    folder = os.path.join(os.path.split(fpath)[0], "originals")
     if not os.path.exists(folder):
         os.mkdir(folder)
 
@@ -986,9 +996,11 @@ def replace_LEDoff_frames(fpath, replacement_frame_number=4):
     # Move the original file.
     if not os.path.exists(move_fpath):
         shutil.move(fpath, move_fpath)
-        print(f'Moved {fpath} to {move_fpath}')
+        print(f"Moved {fpath} to {move_fpath}")
     else:
-        raise FileExistsError('The folder is already storing an original 0.avi. Aborting to prevent overwrite.')
+        raise FileExistsError(
+            "The folder is already storing an original 0.avi. Aborting to prevent overwrite."
+        )
 
     compressionCodec = "FFV1"
     codec = cv2.VideoWriter.fourcc(*compressionCodec)
@@ -999,14 +1011,14 @@ def replace_LEDoff_frames(fpath, replacement_frame_number=4):
     # Get replacement frame.
     cap.set(cv2.CAP_PROP_POS_FRAMES, replacement_frame_number)
     _, replacement_frame = cap.read()
-    replacement_frame = replacement_frame[:,:,1]
+    replacement_frame = replacement_frame[:, :, 1]
 
-    #Return to the first frame.
+    # Return to the first frame.
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
     writeFile = cv2.VideoWriter(fpath, codec, 60, (cols, rows), isColor=False)
     # Rewrite video file.
-    print(f'Writing new {fpath}')
+    print(f"Writing new {fpath}")
     for frame_number in tqdm(range(int(cap.get(7)))):
         ret, frame = cap.read()
 
@@ -1014,7 +1026,7 @@ def replace_LEDoff_frames(fpath, replacement_frame_number=4):
             if frame_number < replacement_frame_number:
                 writeFile.write(np.uint8(replacement_frame))
             else:
-                writeFile.write(np.uint8(frame[:,:,1]))
+                writeFile.write(np.uint8(frame[:, :, 1]))
 
         else:
             break
@@ -1024,10 +1036,7 @@ def replace_LEDoff_frames(fpath, replacement_frame_number=4):
     cv2.destroyAllWindows()
 
 
-
 if __name__ == "__main__":
-    dpath = r'Z:\Will\RemoteReversal\Data\Ron\2021_12_13_Goals1\16_04_26\Miniscope'
-    replace_LEDoff_frames(os.path.join(dpath,'0.avi'), 4)
+    dpath = r"Z:\Will\RemoteReversal\Data\Ron\2021_12_13_Goals1\16_04_26\Miniscope"
+    replace_LEDoff_frames(os.path.join(dpath, "0.avi"), 4)
     # SessionStitcherV4(folder)
-
-

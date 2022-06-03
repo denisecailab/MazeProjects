@@ -114,8 +114,15 @@ def make_tracking_video(
 
 
 def spatial_bin(
-    x, y, bin_size_cm=20, show_plot=False, weights=None, ax=None,
-        bins=None, one_dim=False, nbins=None,
+    x,
+    y,
+    bin_size_cm=20,
+    show_plot=False,
+    weights=None,
+    ax=None,
+    bins=None,
+    one_dim=False,
+    nbins=None,
 ):
     """
     Spatially bins the position data.
@@ -157,10 +164,7 @@ def spatial_bin(
 
     if one_dim:
         if bins is None:
-            bins = np.linspace(
-                x_extrema[0], x_extrema[1],
-                nbins
-            )
+            bins = np.linspace(x_extrema[0], x_extrema[1], nbins)
 
         H, edges = np.histogram(x, bins, weights=weights)
 
@@ -175,12 +179,8 @@ def spatial_bin(
     else:
         if bins is None:
             # Make bins.
-            xbins = np.linspace(
-                x_extrema[0], x_extrema[1], nbins
-            )
-            ybins = np.linspace(
-                y_extrema[0], y_extrema[1], nbins
-            )
+            xbins = np.linspace(x_extrema[0], x_extrema[1], nbins)
+            ybins = np.linspace(y_extrema[0], y_extrema[1], nbins)
             bins = [ybins, xbins]
 
         # Do the binning.

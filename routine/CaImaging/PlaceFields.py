@@ -30,45 +30,46 @@ class PlaceFields:
         nbins=None,
     ):
         """
-        Place field object.
+                Place field object.
 
-        :parameters
-        ---
-        t: array
-            Time array in milliseconds.
+                :parameters
+                ---
+                t: array
+                    Time array in milliseconds.
 
-        x, y: (t,) arrays
-            Positions per sample. Should be in cm. If circular==True,
-            x will be converted to radians, but you should also use
-            circle_radius.
+                x, y: (t,) arrays
+                    Positions per sample. Should be in cm. If circular==True,
+                    x will be converted to radians, but you should also use
+                    circle_radius.
 
-        neural_data: (n,t) array
-            Neural activity (usually S).
-`
-        bin_size: int
-            Bin size in cm.
+                neural_data: (n,t) array
+                    Neural activity (usually S).
+        `
+                bin_size: int
+                    Bin size in cm.
 
-        circular: bool
-            Whether the x data is in radians (for circular tracks).
+                circular: bool
+                    Whether the x data is in radians (for circular tracks).
 
-        shuffle_test: bool
-            Flag to shuffle data in time to recompute spatial information.
+                shuffle_test: bool
+                    Flag to shuffle data in time to recompute spatial information.
 
-        fps: int
-            Sampling rate. If None, will try to compute based on supplied
-            time vector.
+                fps: int
+                    Sampling rate. If None, will try to compute based on supplied
+                    time vector.
 
-        threshold: float
-            Velocity to threshold whether animal is running or not (cm/s).
+                threshold: float
+                    Velocity to threshold whether animal is running or not (cm/s).
 
         """
-        imp = SimpleImputer(missing_values=np.nan, strategy='constant',
-                            fill_value=0)
+        imp = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=0)
         neural_data = imp.fit_transform(neural_data.T).T
 
         if bin_size is not None and nbins is not None:
-            print('Warning! Both bin_size and nbins were assigned values. '
-                  'nbins will take priority. Proceed with caution.')
+            print(
+                "Warning! Both bin_size and nbins were assigned values. "
+                "nbins will take priority. Proceed with caution."
+            )
 
         self.data = {
             "t": t,
@@ -95,7 +96,7 @@ class PlaceFields:
         d = consecutive_dist(
             np.asarray((self.data["x"], self.data["y"])).T, zero_pad=True
         )
-        self.data["velocity"] = d / np.diff(t/1000, prepend=0)
+        self.data["velocity"] = d / np.diff(t / 1000, prepend=0)
         self.data["running"] = self.data["velocity"] > self.meta["velocity_threshold"]
 
         # If we're using circular position, convert data to radians.
@@ -113,8 +114,8 @@ class PlaceFields:
 
             # Shift everything so that 12 o'clock (pi/2) is 0.
             angles += np.pi / 2
-            self.data['x'] = np.mod(angles, 2 * np.pi)
-            self.data['y'] = np.zeros_like(self.data['x'])
+            self.data["x"] = np.mod(angles, 2 * np.pi)
+            self.data["y"] = np.zeros_like(self.data["x"])
 
         # Make occupancy maps and place fields.
         (
@@ -157,7 +158,11 @@ class PlaceFields:
         """
         pfs = []
         for neuron in range(self.data["neural"].shape[0]):
-            pfs.append(self.make_place_field(neuron, show_plot=False, normalize_by_occ=normalize))
+            pfs.append(
+                self.make_place_field(
+                    neuron, show_plot=False, normalize_by_occ=normalize
+                )
+            )
 
         return np.asarray(pfs)
 
@@ -174,9 +179,9 @@ class PlaceFields:
 
         fig, ax = plt.subplots()
         ax.imshow(pfs[order])
-        ax.axis('tight')
-        ax.set_xlabel('Position')
-        ax.set_ylabel('Neuron #')
+        ax.axis("tight")
+        ax.set_xlabel("Position")
+        ax.set_ylabel("Neuron #")
 
         return fig, ax
 
@@ -188,7 +193,9 @@ class PlaceFields:
     def assess_spatial_sig(self, neuron, n_shuffles=500):
         shuffled_SIs = []
         for i in range(n_shuffles):
-            shuffled_pf = self.make_place_field(neuron, show_plot=False, normalize_by_occ=False, shuffle=True)
+            shuffled_pf = self.make_place_field(
+                neuron, show_plot=False, normalize_by_occ=False, shuffle=True
+            )
             shuffled_SIs.append(
                 spatial_information(shuffled_pf, self.data["occupancy_map"])
             )
@@ -267,7 +274,7 @@ class PlaceFields:
             bin_size_cm=self.meta["bin_size"],
             show_plot=show_plot,
             one_dim=self.meta["linearized"],
-            nbins=self.meta["nbins"]
+            nbins=self.meta["nbins"],
         )
         occupancy_map, occupancy_bins = temp[0], temp[-1]
 
@@ -321,7 +328,7 @@ class PlaceFields:
             if ax is None:
                 fig, ax = plt.subplots()
 
-            if self.meta['circular']:
+            if self.meta["circular"]:
                 ax.plot(pf)
             else:
                 ax.imshow(pf, origin="lower")
@@ -390,10 +397,12 @@ def spatial_information(tuning_curve, occupancy):
 
     return bits_per_spk
 
+
 def define_field_bins(placefield, field_threshold=0.5):
     field_bins = np.where(placefield >= max(placefield) * field_threshold)[0]
 
     return field_bins
+
 
 if __name__ == "__main__":
     mouse = "G132"

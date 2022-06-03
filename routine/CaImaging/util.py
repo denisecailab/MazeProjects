@@ -72,7 +72,7 @@ def concat_avis(
         return final_clip_name
 
     # Define writer.
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
     writer = cv2.VideoWriter(final_clip_name, fourcc, fps, size, isColor=isColor)
 
     for file in files:
@@ -105,17 +105,25 @@ def concat_avis(
     return final_clip_name
 
 
-def batch_concat_avis(path: str,
-                      pattern='*.avi',
-                      fname=None,
-                      fps=15,
-                      isColor=True,
-                      delete_original_files=False):
-    folders = search_for_folders(path, '^BehavCam.*$')
+def batch_concat_avis(
+    path: str,
+    pattern="*.avi",
+    fname=None,
+    fps=15,
+    isColor=True,
+    delete_original_files=False,
+):
+    folders = search_for_folders(path, "^BehavCam.*$")
 
     for folder in folders:
-        concat_avis(folder, pattern=pattern, fname=fname, fps=fps,
-                    isColor=isColor, delete_original_files=delete_original_files)
+        concat_avis(
+            folder,
+            pattern=pattern,
+            fname=fname,
+            fps=fps,
+            isColor=isColor,
+            delete_original_files=delete_original_files,
+        )
 
 
 def get_session_folders(mouse_folder):
@@ -179,7 +187,7 @@ def bin_transients(data, bin_size_in_seconds, fps=15, non_binary=False):
     # Convert input into array
     if type(data) is not np.ndarray:
         data = np.asarray(data)
-    #data = np.round(data, 3)
+    # data = np.round(data, 3)
 
     # Group data into bins.
     bins = make_bins(data, bin_size_in_seconds * fps)
@@ -701,11 +709,14 @@ def sync_cameras_v4(miniscope_file, behavior_file):
     return ts_map, ts
 
 
-def sync_data(behavior_data,
-              minian_path,
-              timestamp_path,
-              miniscope_cam=6, behav_cam=1,
-              convert_to_np=True):
+def sync_data(
+    behavior_data,
+    minian_path,
+    timestamp_path,
+    miniscope_cam=6,
+    behav_cam=1,
+    convert_to_np=True,
+):
     """
     Synchronizes minian and behavior time series.
 
@@ -841,6 +852,7 @@ def zscore_list(lst):
 
     return z_list
 
+
 def sem(arr, axis=0):
     """
     Computes the standard error across an axis.
@@ -881,10 +893,10 @@ def group_consecutives(vals, step):
 
 
 def cluster(data, maxgap):
-    '''Arrange data into groups where successive elements
-       differ by no more than *maxgap*
+    """Arrange data into groups where successive elements
+    differ by no more than *maxgap*
 
-    '''
+    """
     data.sort()
     groups = [[data[0]]]
     for x in data[1:]:
@@ -894,9 +906,10 @@ def cluster(data, maxgap):
             groups.append([x])
     return groups
 
+
 def stack_padding(l, fillvalue=np.nan):
-    return np.column_stack((itertools.zip_longest(*l,
-                                                  fillvalue=fillvalue)))
+    return np.column_stack((itertools.zip_longest(*l, fillvalue=fillvalue)))
+
 
 def round_up_to_odd(f):
     return int(np.ceil(f) // 2 * 2 + 1)
@@ -929,10 +942,10 @@ def contiguous_regions(condition):
 
 
 def fix_video(fnames, frame_numbers):
-    folder = os.path.join(os.path.split(fnames[0])[0], 'repaired')
+    folder = os.path.join(os.path.split(fnames[0])[0], "repaired")
     if not os.path.exists(folder):
         os.mkdir(folder)
-        print(f'Created {folder}')
+        print(f"Created {folder}")
 
     compressionCodec = "FFV1"
     codec = cv2.VideoWriter_fourcc(*compressionCodec)
@@ -941,15 +954,14 @@ def fix_video(fnames, frame_numbers):
     shift_amount = buffer_size * 2
     # For each video...
     for video, bad_frame_numbers in zip(fnames, frame_numbers):
-        print(f'Rewriting {video}')
+        print(f"Rewriting {video}")
         cap = cv2.VideoCapture(video)
         rows, cols = int(cap.get(4)), int(cap.get(3))
 
         fname = os.path.split(video)[1]
         new_fpath = os.path.join(folder, fname)
 
-        writeFile = cv2.VideoWriter(new_fpath, codec, 60,
-                                    (cols, rows), isColor=False)
+        writeFile = cv2.VideoWriter(new_fpath, codec, 60, (cols, rows), isColor=False)
 
         for frame_number in tqdm(range(int(cap.get(7)))):
             ret, frame = cap.read()
@@ -965,15 +977,13 @@ def fix_video(fnames, frame_numbers):
                             pixel_number = r * cols + c
                             buf_num = int(pixel_number / buffer_size)
 
-                            if ((buf_num % 2) == 0):
-                                if ((pixel_number + shift_amount) < (
-                                        rows * cols)):
-                                    flattened_frame[pixel_number] = \
-                                    flattened_frame[
-                                        pixel_number + shift_amount]
+                            if (buf_num % 2) == 0:
+                                if (pixel_number + shift_amount) < (rows * cols):
+                                    flattened_frame[pixel_number] = flattened_frame[
+                                        pixel_number + shift_amount
+                                    ]
 
-                    write_frame = flattened_frame.reshape(
-                        (rows, cols))
+                    write_frame = flattened_frame.reshape((rows, cols))
 
                 writeFile.write(np.uint8(write_frame))
             else:
@@ -1019,13 +1029,15 @@ def cart2pol(x, y):
     (phi, rho): tuple
         Angle (linearized distance) and radius (distance from center).
     """
-    rho = np.sqrt(x ** 2 + y ** 2)
+    rho = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
 
     return (phi, rho)
 
+
 def copy_tree_ignore_minian(src, dst):
-    copytree(src, dst, ignore=ignore_patterns('*.*', 'minian'))
+    copytree(src, dst, ignore=ignore_patterns("*.*", "minian"))
+
 
 def cluster_corr(corr_array, inplace=False):
     """
@@ -1042,13 +1054,13 @@ def cluster_corr(corr_array, inplace=False):
     pandas.DataFrame or numpy.ndarray
         a NxN correlation matrix with the columns and rows rearranged
     """
-    corr_array = (corr_array + corr_array.T)/2
+    corr_array = (corr_array + corr_array.T) / 2
     np.fill_diagonal(corr_array, 1)
     dissimilarity = 1 - np.abs(corr_array)
     pairwise_distances = sch.distance.pdist(dissimilarity)
-    linkage = sch.linkage(pairwise_distances, method='complete')
-    cluster_distance_threshold = pairwise_distances.max()/2
-    labels = sch.fcluster(linkage, cluster_distance_threshold, criterion='distance')
+    linkage = sch.linkage(pairwise_distances, method="complete")
+    cluster_distance_threshold = pairwise_distances.max() / 2
+    labels = sch.fcluster(linkage, cluster_distance_threshold, criterion="distance")
     idx = np.argsort(labels)
 
     if not inplace:
@@ -1059,15 +1071,17 @@ def cluster_corr(corr_array, inplace=False):
 
     return labels, idx, linkage
 
+
 def cluster_corr2(corr_array):
-    corr_array = (corr_array + corr_array.T)/2
+    corr_array = (corr_array + corr_array.T) / 2
     np.fill_diagonal(corr_array, 1)
     dissimilarity = 1 - np.abs(corr_array)
-    threshold = np.max(dissimilarity)/2
-    hierarchy = sch.linkage(squareform(dissimilarity), method='complete')
-    labels = sch.fcluster(hierarchy, threshold, criterion='distance')
+    threshold = np.max(dissimilarity) / 2
+    hierarchy = sch.linkage(squareform(dissimilarity), method="complete")
+    labels = sch.fcluster(hierarchy, threshold, criterion="distance")
 
     return labels
+
 
 if __name__ == "__main__":
     # folder = r'Z:\Will\Drift\Data\Betelgeuse_Scope25\08_03_2020_CircleTrackReversal1\H15_M30_S35'
@@ -1083,5 +1097,3 @@ if __name__ == "__main__":
     timestamp_path = r"Z:\Lingxuan\LC_miniscope\G09-G15\Imaging\G11\8_10_2020\H11_M18_S5\timestamp.dat"
 
     # sync_data(behavior_path, minian_path, timestamp_path, miniscope_cam=2, behav_cam=0)
-
-

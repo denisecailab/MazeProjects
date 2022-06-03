@@ -7,19 +7,19 @@ import numpy as np
 from matplotlib import gridspec
 from routine.util import Session_Metadata, find_timestamp_file
 
-from Assemblies import (find_members, plot_assembly,
-                        write_assembly_triggered_movie)
-from BehaviorFunctions import (BehaviorSession, linearize_trajectory,
-                               make_tracking_video)
+from Assemblies import find_members, plot_assembly, write_assembly_triggered_movie
+from BehaviorFunctions import BehaviorSession, linearize_trajectory, make_tracking_video
 from plotting import plot_raster, plot_spiral, spiral_plot
 from utils import find_reward_spatial_bins, get_equivalent_local_path, sync
 
-from ..CaImaging.Assemblies import (find_assemblies, membership_sort,
-                                    plot_assemblies,
-                                    preprocess_multiple_sessions)
+from ..CaImaging.Assemblies import (
+    find_assemblies,
+    membership_sort,
+    plot_assemblies,
+    preprocess_multiple_sessions,
+)
 from ..CaImaging.Behavior import spatial_bin
-from ..CaImaging.Miniscope import (get_transient_timestamps,
-                                   nan_corrupted_frames)
+from ..CaImaging.Miniscope import get_transient_timestamps, nan_corrupted_frames
 from ..CaImaging.PlaceFields import PlaceFields, define_field_bins
 from ..CaImaging.util import ScrollPlot, nan_array, sync_cameras_v4
 
@@ -37,7 +37,7 @@ class CalciumSession:
         S_std_thresh=1,
         velocity_threshold=7,
         place_cell_alpha=0.001,
-        place_cell_transient_threshold='n_trials',
+        place_cell_transient_threshold="n_trials",
         overwrite_synced_data=False,
         overwrite_placefields=False,
         overwrite_placefield_trials=False,
@@ -193,12 +193,15 @@ class CalciumSession:
             with open(fpath, "wb") as file:
                 pkl.dump(self.assemblies, file)
 
-        if place_cell_transient_threshold == 'n_trials':
-            place_cell_transient_threshold = self.behavior.data['ntrials']
-        self.spatial.data['place_cells'] = self.get_place_cells(alpha=place_cell_alpha,
-                                                                transient_threshold=place_cell_transient_threshold)
-        self.spatial.meta['place_cell_pval'] = place_cell_alpha
-        self.spatial.meta['place_cell_transient_threshold'] = place_cell_transient_threshold
+        if place_cell_transient_threshold == "n_trials":
+            place_cell_transient_threshold = self.behavior.data["ntrials"]
+        self.spatial.data["place_cells"] = self.get_place_cells(
+            alpha=place_cell_alpha, transient_threshold=place_cell_transient_threshold
+        )
+        self.spatial.meta["place_cell_pval"] = place_cell_alpha
+        self.spatial.meta[
+            "place_cell_transient_threshold"
+        ] = place_cell_transient_threshold
 
     def get_pkl_path(self, fname):
         if self.meta["local"]:
@@ -235,7 +238,7 @@ class CalciumSession:
         """
         # Get spiking activity and time vector.
         if neurons is None:
-            neurons = range(self.imaging['S_binary'])
+            neurons = range(self.imaging["S_binary"])
         spikes = np.vstack([spikes_i for spikes_i in self.imaging["S_binary"][neurons]])
         t = np.asarray(self.behavior.data["df"]["frame"])
 
@@ -248,8 +251,8 @@ class CalciumSession:
             plot_spiral,
             t=t,
             lin_position=lin_position,
-            lin_ports=self.behavior.data['lin_ports'],
-            rewarded=self.behavior.data['rewarded_ports'],
+            lin_ports=self.behavior.data["lin_ports"],
+            rewarded=self.behavior.data["rewarded_ports"],
             markers=spikes,
             marker_legend="Spikes",
             subplot_kw={"projection": "polar"},
@@ -263,17 +266,19 @@ class CalciumSession:
         rasters = self.spatial.data["rasters"][neurons]
         if binary:
             rasters = rasters > 0
-            cmap = 'binary'
+            cmap = "binary"
         else:
-            cmap = 'gray'
+            cmap = "gray"
 
         tuning_curves = self.spatial.data["placefields_normalized"][neurons]
 
         behavior_data = self.behavior.data
 
-        port_bins = find_reward_spatial_bins(behavior_data['df']['lin_position'],
-                                               np.asarray(behavior_data['lin_ports']),
-                                               spatial_bin_size_radians=self.spatial.meta['bin_size'])[0]
+        port_bins = find_reward_spatial_bins(
+            behavior_data["df"]["lin_position"],
+            np.asarray(behavior_data["lin_ports"]),
+            spatial_bin_size_radians=self.spatial.meta["bin_size"],
+        )[0]
 
         cell_number_labels = [f"Cell #{n}" for n in neurons]
         self.raster_plot = ScrollPlot(
@@ -282,9 +287,9 @@ class CalciumSession:
             rasters=rasters,
             tuning_curves=tuning_curves,
             port_bins=port_bins,
-            rewarded=behavior_data['rewarded_ports'],
+            rewarded=behavior_data["rewarded_ports"],
             cmap=cmap,
-            interpolation='none',
+            interpolation="none",
             titles=cell_number_labels,
             figsize=(5, 8),
         )
@@ -320,20 +325,28 @@ class CalciumSession:
             assembly_number = [assemblies]
 
         behavior_data = self.behavior.data
-        above_threshold = np.vstack([zscore(self.assemblies['activations'][assembly]) > threshold
-                                    for assembly in assemblies])
+        above_threshold = np.vstack(
+            [
+                zscore(self.assemblies["activations"][assembly]) > threshold
+                for assembly in assemblies
+            ]
+        )
 
         if ax is None:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection="polar")
-        ax = spiral_plot(t=behavior_data['df']['t'],
-                         lin_position=behavior_data['df']['lin_position'],
-                         markers=above_threshold,
-                         ax=ax,
-                         marker_legend='Ensemble activation')
-        #ax.set_title(f"Ensemble {assemblies}")
-        for rewarded, port in zip(behavior_data['rewarded_ports'], behavior_data['lin_ports']):
-            color = 'g' if rewarded else 'gray'
+        ax = spiral_plot(
+            t=behavior_data["df"]["t"],
+            lin_position=behavior_data["df"]["lin_position"],
+            markers=above_threshold,
+            ax=ax,
+            marker_legend="Ensemble activation",
+        )
+        # ax.set_title(f"Ensemble {assemblies}")
+        for rewarded, port in zip(
+            behavior_data["rewarded_ports"], behavior_data["lin_ports"]
+        ):
+            color = "g" if rewarded else "gray"
             ax.axvline(x=port, color=color)
 
         return ax
@@ -342,8 +355,10 @@ class CalciumSession:
         pass
 
     def get_ensemble_field_COM(self, ensemble_number):
-        COM = np.average(self.behavior.data['df']['lin_position'],
-                         weights=self.assemblies['activations'][ensemble_number])
+        COM = np.average(
+            self.behavior.data["df"]["lin_position"],
+            weights=self.assemblies["activations"][ensemble_number],
+        )
 
         return COM
 
@@ -364,10 +379,12 @@ class CalciumSession:
         running = self.spatial.data["running"]
         filler = np.zeros_like(lin_position)
         if nbins is None:
-            if self.spatial.meta['nbins'] is None: # If spatial fields nbins was also not specified, use bin size.
+            if (
+                self.spatial.meta["nbins"] is None
+            ):  # If spatial fields nbins was also not specified, use bin size.
                 bin_size = self.meta["spatial_bin_size"]
             else:
-                nbins = self.spatial.meta['nbins']
+                nbins = self.spatial.meta["nbins"]
                 bin_size = None
         else:
             bin_size = self.meta["spatial_bin_size"]
@@ -400,8 +417,11 @@ class CalciumSession:
 
             # Get occupancy this trial.
             occupancy = spatial_bin(
-                positions_this_trial, filler, bins=bin_edges, one_dim=True,
-                weights=running_this_trial.astype(int)
+                positions_this_trial,
+                filler,
+                bins=bin_edges,
+                one_dim=True,
+                weights=running_this_trial.astype(int),
             )[0]
 
             # Weight position by activity of each neuron.
@@ -421,15 +441,26 @@ class CalciumSession:
         return fields, occ_map_by_trial
 
     def get_place_cells(self, alpha=0.001, transient_threshold=40):
-        n_transients = np.sum(np.sum(self.spatial.data['rasters'], axis=1), axis=1)
-        place_cells = np.where(np.logical_and(self.spatial.data['spatial_info_pvals'] < alpha,
-                               n_transients> transient_threshold))[0]
+        n_transients = np.sum(np.sum(self.spatial.data["rasters"], axis=1), axis=1)
+        place_cells = np.where(
+            np.logical_and(
+                self.spatial.data["spatial_info_pvals"] < alpha,
+                n_transients > transient_threshold,
+            )
+        )[0]
 
         return place_cells
 
-    def placefield_reliability(self, spatial_data, neuron: int, field_threshold=0.5,
-                               tuning_curve='placefields_normalized', even_split=True,
-                               split=4, show_plot=True):
+    def placefield_reliability(
+        self,
+        spatial_data,
+        neuron: int,
+        field_threshold=0.5,
+        tuning_curve="placefields_normalized",
+        even_split=True,
+        split=4,
+        show_plot=True,
+    ):
         """
         Compute the trial-by-trial in-field consistency of a neuron (whether it fired in field).
 
@@ -453,8 +484,10 @@ class CalciumSession:
             If not even_split, the number of trials in each split.
 
         """
-        raster = spatial_data['rasters'][neuron]
-        field_bins = define_field_bins(spatial_data[tuning_curve][neuron], field_threshold=field_threshold)
+        raster = spatial_data["rasters"][neuron]
+        field_bins = define_field_bins(
+            spatial_data[tuning_curve][neuron], field_threshold=field_threshold
+        )
         threshold = np.nanmean(raster[:, field_bins])
         fired_in_field = np.any(raster[:, field_bins] > threshold, axis=1)
 
@@ -466,45 +499,50 @@ class CalciumSession:
         # Handles cases where you don't actually want to split the reliability across trials.
         # In other words, just take the fraction of trials where the unit was active.
         if split == 1 and even_split:
-            reliability = np.sum(split_fired_in_field[0])/len(split_fired_in_field[0])
+            reliability = np.sum(split_fired_in_field[0]) / len(split_fired_in_field[0])
         else:
-            reliability = [np.sum(fired_in_field) / len(fired_in_field) for fired_in_field in split_fired_in_field]
+            reliability = [
+                np.sum(fired_in_field) / len(fired_in_field)
+                for fired_in_field in split_fired_in_field
+            ]
 
         if show_plot:
             if split > 1:
-                fig, axs = plt.subplots(1,2)
+                fig, axs = plt.subplots(1, 2)
                 axs[1].plot(reliability, range(len(reliability)))
                 axs[1].set_xlim([0, 1])
                 axs[1].invert_yaxis()
-                axs[1].set_ylabel(f'Trial block #, {len(split_fired_in_field[0])} trials per block')
-                axs[1].set_xlabel('Proportion of trials with '
-                                  '\n in-field calcium transient')
+                axs[1].set_ylabel(
+                    f"Trial block #, {len(split_fired_in_field[0])} trials per block"
+                )
+                axs[1].set_xlabel(
+                    "Proportion of trials with " "\n in-field calcium transient"
+                )
             else:
                 fig, axs = plt.subplots()
                 axs = [axs]
-                axs[0].set_title(f'Reliability: {reliability}')
+                axs[0].set_title(f"Reliability: {reliability}")
 
-            axs[0].imshow(raster > 0, aspect='auto')
-            axs[0].set_xlabel('Position')
-            axs[0].set_ylabel('Trials')
+            axs[0].imshow(raster > 0, aspect="auto")
+            axs[0].set_xlabel("Position")
+            axs[0].set_ylabel("Trials")
 
             fig.tight_layout()
 
         return reliability
 
     def port_reliability(self, neuron, even_split=False, splits=6, show_plot=True):
-        spatial_bins = np.linspace(0, 2*np.pi, 8)
-        S_binary = self.imaging['S_binary'][neuron]
-        df = self.behavior.data['df']
-        ntrials = self.behavior.data['ntrials']
-        in_bin = np.digitize(df['lin_position'],
-                             spatial_bins, right=False)
+        spatial_bins = np.linspace(0, 2 * np.pi, 8)
+        S_binary = self.imaging["S_binary"][neuron]
+        df = self.behavior.data["df"]
+        ntrials = self.behavior.data["ntrials"]
+        in_bin = np.digitize(df["lin_position"], spatial_bins, right=False)
 
         reliability_matrix = nan_array((ntrials, 8))
         for trial in range(ntrials):
-            on_trial = df['trials'] == trial
+            on_trial = df["trials"] == trial
             for bin in range(8):
-                inds = on_trial & (in_bin==bin)
+                inds = on_trial & (in_bin == bin)
                 reliability_matrix[trial, bin] = np.sum(S_binary[inds])
 
         return reliability_matrix
@@ -587,8 +625,15 @@ class CalciumSession:
             trials=trials,
         )
 
-    def plot_assembly(self, assembly_number, neurons=None, members_only=True,
-                      filter_method='sd', thresh=2, z_score=False):
+    def plot_assembly(
+        self,
+        assembly_number,
+        neurons=None,
+        members_only=True,
+        filter_method="sd",
+        thresh=2,
+        z_score=False,
+    ):
         pattern = self.assemblies["patterns"][assembly_number]
         n_neurons = len(pattern)
         activation = self.assemblies["activations"][assembly_number]
@@ -602,11 +647,13 @@ class CalciumSession:
         # This option lets you only plot the ensemble members.
         if members_only:
             sort_by_contribution = False
-            spike_colors = 'k'
+            spike_colors = "k"
         else:
             members = np.arange(n_neurons)
             sort_by_contribution = True
-            spike_colors = np.asarray(['c' if member else 'k' for member in np.squeeze(bool_members)])
+            spike_colors = np.asarray(
+                ["c" if member else "k" for member in np.squeeze(bool_members)]
+            )
 
         if neurons is None:
             if members_only:
@@ -641,12 +688,12 @@ class CalciumSession:
             ax=assembly_ax,
             spike_colors=spike_colors,
         )
-        activation_ax.set_title(f'Ensemble # {assembly_number}', fontsize=22)
-        [assembly_ax.spines[side].set_visible(False) for side in ['top', 'right']]
+        activation_ax.set_title(f"Ensemble # {assembly_number}", fontsize=22)
+        [assembly_ax.spines[side].set_visible(False) for side in ["top", "right"]]
 
         activation_ax.set_xticks(activation_ax.get_xlim())
         activation_ax.set_xticklabels([0, 1800])
-        activation_ax.set_xlabel('Time (s)')
+        activation_ax.set_xlabel("Time (s)")
 
         if members_only:
             n_members = len(members)
@@ -666,10 +713,10 @@ class CalciumSession:
                 basefmt=" ",
                 markerfmt="bo",
             )[:2]
-            plt.setp(stemlines_members, 'linewidth', 1)
-            plt.setp(markerlines_members, 'markersize', 1)
-            plt.setp(stemlines, 'linewidth', 1)
-            plt.setp(markerlines, 'markersize', 1)
+            plt.setp(stemlines_members, "linewidth", 1)
+            plt.setp(markerlines_members, "markersize", 1)
+            plt.setp(stemlines, "linewidth", 1)
+            plt.setp(markerlines, "markersize", 1)
         else:
             markerlines, stemlines = pattern_ax.stem(
                 range(len(pattern)),
@@ -679,8 +726,8 @@ class CalciumSession:
                 basefmt=" ",
                 markerfmt="bo",
             )[:2]
-            plt.setp(stemlines, 'linewidth', 1)
-            plt.setp(markerlines, 'markersize', 1)
+            plt.setp(stemlines, "linewidth", 1)
+            plt.setp(markerlines, "markersize", 1)
 
         pattern_ax.invert_yaxis()
         pattern_ax.axis("off")
@@ -708,26 +755,29 @@ class CalciumSession:
             synchronized with. Doesn't include the second value.
 
         """
-        timestamp_fpath = self.meta['paths']['timestamps']
+        timestamp_fpath = self.meta["paths"]["timestamps"]
         miniscope_file = find_timestamp_file(timestamp_fpath, "Miniscope")
         behavior_file = find_timestamp_file(timestamp_fpath, "BehavCam")
         sync_map, DAQ_data = sync_cameras_v4(miniscope_file, behavior_file)
 
         frame_window = [vid * 1000 for vid in miniscope_vids]
-        frames = np.asarray(sync_map['fmCam1'][np.arange(frame_window[0],
-                                                         frame_window[1])])
+        frames = np.asarray(
+            sync_map["fmCam1"][np.arange(frame_window[0], frame_window[1])]
+        )
 
-        make_tracking_video(self.meta['folder'],
-                            output_fname=f'{miniscope_vids[0]}_{miniscope_vids[1]}.avi',
-                            frames=frames,
-                            fps=60)
+        make_tracking_video(
+            self.meta["folder"],
+            output_fname=f"{miniscope_vids[0]}_{miniscope_vids[1]}.avi",
+            frames=frames,
+            fps=60,
+        )
 
 
 if __name__ == "__main__":
     folder = r"Z:\Will\RemoteReversal\Data\Fornax\2021_02_24_Goals4\09_06_18"
     S = CalciumSession(folder)
-    #pvals = S.spatial["placefield_class"].data["spatial_info_pvals"]
-    #S.scrollplot_rasters(neurons=np.where(np.asarray(pvals) < 0.01)[0], binary=True)
+    # pvals = S.spatial["placefield_class"].data["spatial_info_pvals"]
+    # S.scrollplot_rasters(neurons=np.where(np.asarray(pvals) < 0.01)[0], binary=True)
     # S.spatial_activity_by_trial(0.1)
     # S.correlate_spatial_PVs_by_trial()
     S.plot_all_assemblies()
