@@ -5,10 +5,10 @@ from tkinter import filedialog
 
 import pandas as pd
 
-from CaImaging.util import get_data_paths, search_for_folders
+from .CaImaging.util import get_data_paths, search_for_folders
 
-tkroot = tk.Tk()
-tkroot.withdraw()
+# tkroot = tk.Tk()
+# tkroot.withdraw()
 
 
 def make_pattern_dict():

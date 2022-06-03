@@ -1,16 +1,12 @@
 import os
 import pickle as pkl
+from itertools import product
 
 import holoviews as hv
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec
-from routine.util import Session_Metadata, find_timestamp_file
-
-from Assemblies import find_members, plot_assembly, write_assembly_triggered_movie
-from BehaviorFunctions import BehaviorSession, linearize_trajectory, make_tracking_video
-from plotting import plot_raster, plot_spiral, spiral_plot
-from utils import find_reward_spatial_bins, get_equivalent_local_path, sync
+from scipy.stats import spearmanr, zscore
 
 from ..CaImaging.Assemblies import (
     find_assemblies,
@@ -22,11 +18,17 @@ from ..CaImaging.Behavior import spatial_bin
 from ..CaImaging.Miniscope import get_transient_timestamps, nan_corrupted_frames
 from ..CaImaging.PlaceFields import PlaceFields, define_field_bins
 from ..CaImaging.util import ScrollPlot, nan_array, sync_cameras_v4
+from ..util import Session_Metadata, find_timestamp_file
+from .Assemblies import find_members, plot_assembly, write_assembly_triggered_movie
+from .BehaviorFunctions import (
+    BehaviorSession,
+    linearize_trajectory,
+    make_tracking_video,
+)
+from .plotting import plot_raster, plot_spiral, spiral_plot
+from .utils import find_reward_spatial_bins, get_equivalent_local_path, sync
 
 hv.extension("bokeh")
-from itertools import product
-
-from scipy.stats import spearmanr, zscore
 
 
 class CalciumSession:

@@ -7,8 +7,8 @@ from joblib import Parallel, delayed
 from sklearn.impute import SimpleImputer
 from tqdm import tqdm
 
-from Behavior import spatial_bin
-from util import cart2pol, consecutive_dist
+from .Behavior import spatial_bin
+from .util import cart2pol, consecutive_dist
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams.update({"font.size": 12})

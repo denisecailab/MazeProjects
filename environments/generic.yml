@@ -257,3 +257,4 @@ dependencies:
   - charset-normalizer=2.0.12
   - zfp=0.5.5
   - black
+  - pyserial

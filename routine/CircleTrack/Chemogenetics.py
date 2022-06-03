@@ -9,11 +9,10 @@ import xarray as xr
 from scipy.stats import ttest_ind
 from statsmodels.stats.multitest import multipletests
 
-from BehaviorFunctions import BehaviorSession
-from SessionCollation import MultiAnimal
-
 from ..CaImaging.plotting import errorfill, jitter_x
 from ..CaImaging.util import group_consecutives, nan_array, sem, stack_padding
+from .BehaviorFunctions import BehaviorSession
+from .SessionCollation import MultiAnimal
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

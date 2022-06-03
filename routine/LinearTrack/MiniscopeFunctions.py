@@ -1,11 +1,7 @@
 import os
 import pickle as pkl
 
-import matplotlib.pyplot as plt
 import numpy as np
-
-from BehaviorFunctions import BehaviorSession
-from plotting import plot_directional_raster, plot_raster
 
 from ..CaImaging.Behavior import spatial_bin
 from ..CaImaging.Miniscope import get_transient_timestamps, nan_corrupted_frames
@@ -13,6 +9,8 @@ from ..CaImaging.PlaceFields import PlaceFields
 from ..CaImaging.util import ScrollPlot, nan_array
 from ..CircleTrack.utils import get_equivalent_local_path, sync
 from ..util import Session_Metadata
+from .BehaviorFunctions import BehaviorSession
+from .plotting import plot_directional_raster, plot_raster
 
 
 class CalciumSession:

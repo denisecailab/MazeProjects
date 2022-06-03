@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from tkinter import filedialog
 
 import cv2
 import matplotlib.pyplot as plt
@@ -7,12 +8,10 @@ import numpy as np
 import pandas as pd
 from matplotlib.animation import FFMpegWriter
 from numpy.lib.stride_tricks import sliding_window_view
-from routine.util import Session_Metadata, find_timestamp_file, grab_paths
+from scipy.ndimage import gaussian_filter1d
 from scipy.signal import savgol_filter
 from scipy.stats import norm, zscore
-
-from plotting import highlight_column, spiral_plot
-from utils import circle_sizes
+from skimage.feature import blob_doh
 
 from ..CaImaging.Behavior import convert_dlc_to_eztrack, read_eztrack
 from ..CaImaging.LickArduino import clean_Arduino_output
@@ -28,13 +27,12 @@ from ..CaImaging.util import (
     sync_cameras,
     sync_cameras_v4,
 )
+from ..util import Session_Metadata, find_timestamp_file, grab_paths
+from .plotting import highlight_column, spiral_plot
+from .utils import circle_sizes
 
-tkroot = tk.Tk()
-tkroot.withdraw()
-from tkinter import filedialog
-
-from scipy.ndimage import gaussian_filter1d
-from skimage.feature import blob_doh
+# tkroot = tk.Tk()
+# tkroot.withdraw()
 
 
 def make_tracking_video(

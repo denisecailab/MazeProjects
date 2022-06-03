@@ -5,10 +5,9 @@ from matplotlib import pyplot as plt
 from scipy.stats import wilcoxon
 from statsmodels.stats.multitest import multipletests
 
-from SessionCollation import MultiAnimal
-
 from ..CaImaging.plotting import errorfill
 from ..CaImaging.util import nan_array, sem
+from .SessionCollation import MultiAnimal
 
 
 class BatchBehaviorAnalyses:

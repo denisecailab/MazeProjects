@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import pingouin as pg
 import pymannkendall as mk
-import ruptures as rpt
 import seaborn as sns
 import xarray as xr
 from matplotlib.pyplot import cm
@@ -34,7 +33,6 @@ from scipy.stats import (
     zscore,
 )
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_selection import RFECV
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics.pairwise import cosine_similarity
@@ -43,24 +41,6 @@ from sklearn.naive_bayes import BernoulliNB, GaussianNB
 from statsmodels.stats.multitest import multipletests
 from statsmodels.tsa.stattools import adfuller, grangercausalitytests
 from tqdm import tqdm
-
-from Assemblies import find_members, plot_assembly, plot_pattern
-from MiniscopeFunctions import CalciumSession
-from plotting import (
-    color_boxes,
-    highlight_column,
-    plot_daily_rasters,
-    plot_port_activations,
-    plot_raster,
-    spiral_plot,
-)
-from SessionCollation import MultiAnimal
-from utils import (
-    find_reward_spatial_bins,
-    format_spatial_location_for_decoder,
-    get_circular_error,
-    get_equivalent_local_path,
-)
 
 from ..CaImaging.Assemblies import (
     find_assemblies,
@@ -87,6 +67,23 @@ from ..CaImaging.util import (
     open_minian,
     sem,
     stack_padding,
+)
+from .Assemblies import find_members, plot_assembly, plot_pattern
+from .MiniscopeFunctions import CalciumSession
+from .plotting import (
+    color_boxes,
+    highlight_column,
+    plot_daily_rasters,
+    plot_port_activations,
+    plot_raster,
+    spiral_plot,
+)
+from .SessionCollation import MultiAnimal
+from .utils import (
+    find_reward_spatial_bins,
+    format_spatial_location_for_decoder,
+    get_circular_error,
+    get_equivalent_local_path,
 )
 
 plt.rcParams["pdf.fonttype"] = 42

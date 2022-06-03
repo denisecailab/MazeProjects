@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import pyplot as plt
 
-from util import check_attrs
+from .util import check_attrs
 
 
 def overlay_footprints(ScrollObj):

@@ -4,11 +4,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from BehaviorFunctions import BehaviorSession
-from SessionCollation import MultiAnimal
-
 from ..CaImaging.plotting import beautify_ax, errorfill, jitter_x
 from ..CaImaging.util import nan_array, sem
+from .BehaviorFunctions import BehaviorSession
+from .SessionCollation import MultiAnimal
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

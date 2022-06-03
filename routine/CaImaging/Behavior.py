@@ -8,10 +8,10 @@ import numpy as np
 import pandas as pd
 from matplotlib.animation import FFMpegWriter
 
-from util import ScrollPlot, consecutive_dist, disp_frame
+from .util import ScrollPlot, consecutive_dist, disp_frame
 
-tkroot = tk.Tk()
-tkroot.withdraw()
+# tkroot = tk.Tk()
+# tkroot.withdraw()
 
 
 def read_eztrack(csv_fname):

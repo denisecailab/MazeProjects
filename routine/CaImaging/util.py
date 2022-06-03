@@ -17,10 +17,10 @@ from natsort import natsorted
 from scipy.spatial.distance import squareform
 from tqdm import tqdm
 
-from Miniscope import open_minian
+from .Miniscope import open_minian
 
-tkroot = tk.Tk()
-tkroot.withdraw()
+# tkroot = tk.Tk()
+# tkroot.withdraw()
 
 
 def concat_avis(

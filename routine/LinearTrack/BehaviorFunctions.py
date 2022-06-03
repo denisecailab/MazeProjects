@@ -5,7 +5,6 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from routine.util import Session_Metadata, find_timestamp_file
 from scipy.stats import zscore
 
 from ..CaImaging.Behavior import convert_dlc_to_eztrack
@@ -16,6 +15,7 @@ from ..CircleTrack.BehaviorFunctions import (
     make_tracking_video,
     sync_Arduino_outputs,
 )
+from ..util import Session_Metadata, find_timestamp_file
 
 
 class Preprocess:

@@ -25,8 +25,8 @@ from ..CaImaging.util import (
     sync_data,
 )
 
-tkroot = tk.Tk()
-tkroot.withdraw()
+# tkroot = tk.Tk()
+# tkroot.withdraw()
 
 
 def circle_sizes(x, y):

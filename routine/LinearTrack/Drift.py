@@ -8,14 +8,13 @@ import xarray as xr
 from scipy.stats import pearsonr, spearmanr
 from sklearn.impute import SimpleImputer
 
-from MiniscopeFunctions import CalciumSession
-
 from ..CaImaging.Behavior import spatial_bin
 from ..CaImaging.CellReg import rearrange_neurons, trim_map
 from ..CaImaging.plotting import beautify_ax, errorfill, jitter_x
 from ..CaImaging.util import nan_array, sem
 from ..CircleTrack.BehaviorFunctions import BehaviorSession
 from ..CircleTrack.SessionCollation import MultiAnimal
+from .MiniscopeFunctions import CalciumSession
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

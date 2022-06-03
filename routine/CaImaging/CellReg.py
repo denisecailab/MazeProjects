@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 from natsort import natsorted
 
-from Miniscope import open_minian
-from plotting import overlay_footprints
-from util import ScrollPlot, filter_sessions, nan_array
+from .Miniscope import open_minian
+from .plotting import overlay_footprints
+from .util import ScrollPlot, filter_sessions, nan_array
 
 
 class SpatialFootprints:

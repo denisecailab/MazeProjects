@@ -16,7 +16,7 @@ from sklearn.impute import SimpleImputer
 from tqdm import tqdm
 
 import util
-from Miniscope import get_transient_timestamps
+from .Miniscope import get_transient_timestamps
 
 __author__ = "Vítor Lopes dos Santos"
 __version__ = "2019.1"
