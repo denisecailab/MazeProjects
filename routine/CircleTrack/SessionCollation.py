@@ -1,9 +1,12 @@
-from CircleTrack.BehaviorFunctions import BehaviorSession
-from CircleTrack.MiniscopeFunctions import CalciumSession
-from LinearTrack.BehaviorFunctions import BehaviorSession as LTBehaviorSession
-from CaImaging.CellReg import CellRegObj
-from CircleTrack.sql import Database
 import os
+
+from BehaviorFunctions import BehaviorSession
+from MiniscopeFunctions import CalciumSession
+from sql import Database
+
+from ..CaImaging.CellReg import CellRegObj
+from ..LinearTrack.BehaviorFunctions import \
+    BehaviorSession as LTBehaviorSession
 
 directory = r'D:'
 db_fname = 'database.sqlite'

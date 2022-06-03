@@ -1,12 +1,14 @@
-import numpy as np
-from CircleTrack.SessionCollation import MultiAnimal
-from CircleTrack.BehaviorFunctions import BehaviorSession
-import matplotlib.pyplot as plt
-import xarray as xr
-from CaImaging.util import nan_array, sem
-import pandas as pd
-from CaImaging.plotting import errorfill, beautify_ax, jitter_x
 import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from BehaviorFunctions import BehaviorSession
+from SessionCollation import MultiAnimal
+
+from ..CaImaging.plotting import beautify_ax, errorfill, jitter_x
+from ..CaImaging.util import nan_array, sem
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

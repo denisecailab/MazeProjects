@@ -1,17 +1,19 @@
-import numpy as np
-from CircleTrack.SessionCollation import MultiAnimal
-from CircleTrack.BehaviorFunctions import BehaviorSession
-import matplotlib.pyplot as plt
-import xarray as xr
-from scipy.stats import ttest_ind, mannwhitneyu, ranksums
-from CaImaging.util import nan_array, sem, stack_padding, group_consecutives
-import pandas as pd
-from CaImaging.plotting import errorfill, beautify_ax, jitter_x
-import matplotlib.patches as mpatches
 import os
+
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import pingouin as pg
+import xarray as xr
+from scipy.stats import ttest_ind
 from statsmodels.stats.multitest import multipletests
-from scipy.integrate import simps
+
+from BehaviorFunctions import BehaviorSession
+from SessionCollation import MultiAnimal
+
+from ..CaImaging.plotting import errorfill, jitter_x
+from ..CaImaging.util import group_consecutives, nan_array, sem, stack_padding
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

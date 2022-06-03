@@ -1,37 +1,33 @@
 import os
+import tkinter as tk
+
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.animation import FFMpegWriter
-from CaImaging.LickArduino import clean_Arduino_output
-from CaImaging.util import (
-    find_closest,
-    ScrollPlot,
-    disp_frame,
-    consecutive_dist,
-    sync_cameras,
-    nan_array,
-    round_up_to_odd,
-    contiguous_regions,
-    sync_cameras_v4, cart2pol,
-)
-from CaImaging.Behavior import read_eztrack, convert_dlc_to_eztrack
-from scipy.stats import zscore, norm
-from scipy.signal import savgol_filter
-import matplotlib.pyplot as plt
-import cv2
-
 from numpy.lib.stride_tricks import sliding_window_view
+from routine.util import Session_Metadata, find_timestamp_file, grab_paths
+from scipy.signal import savgol_filter
+from scipy.stats import norm, zscore
 
-from CircleTrack.plotting import spiral_plot, highlight_column
-from CircleTrack.utils import circle_sizes
-from util import grab_paths, Session_Metadata, find_timestamp_file
-import tkinter as tk
+from plotting import highlight_column, spiral_plot
+from utils import circle_sizes
+
+from ..CaImaging.Behavior import convert_dlc_to_eztrack, read_eztrack
+from ..CaImaging.LickArduino import clean_Arduino_output
+from ..CaImaging.util import (ScrollPlot, cart2pol, consecutive_dist,
+                              contiguous_regions, disp_frame, find_closest,
+                              nan_array, round_up_to_odd, sync_cameras,
+                              sync_cameras_v4)
 
 tkroot = tk.Tk()
 tkroot.withdraw()
 from tkinter import filedialog
+
 from scipy.ndimage import gaussian_filter1d
 from skimage.feature import blob_doh
+
 
 def make_tracking_video(
     session_folder,

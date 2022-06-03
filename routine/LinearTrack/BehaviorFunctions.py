@@ -1,25 +1,20 @@
-from tkinter import filedialog
-from util import Session_Metadata
-from CaImaging.Behavior import convert_dlc_to_eztrack
-import pandas as pd
 import os
-import numpy as np
-from util import find_timestamp_file
+from tkinter import filedialog
+
 import cv2
-from CaImaging.util import (
-    ScrollPlot,
-    disp_frame,
-    consecutive_dist,
-)
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from routine.util import Session_Metadata, find_timestamp_file
 from scipy.stats import zscore
-from CircleTrack.BehaviorFunctions import (
-    sync_Arduino_outputs,
-    clean_lick_detection,
-    make_tracking_video,
-    find_water_ports,
-    find_rewarded_ports,
-)
+
+from ..CaImaging.Behavior import convert_dlc_to_eztrack
+from ..CaImaging.util import ScrollPlot, consecutive_dist, disp_frame
+from ..CircleTrack.BehaviorFunctions import (clean_lick_detection,
+                                             find_water_ports,
+                                             make_tracking_video,
+                                             sync_Arduino_outputs)
+
 
 class Preprocess:
     def __init__(

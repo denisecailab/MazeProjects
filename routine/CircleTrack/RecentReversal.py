@@ -1,101 +1,60 @@
-import matplotlib.pyplot as plt
-import matplotlib
-from matplotlib.pyplot import cm
-from CaImaging.util import (
-    sem,
-    nan_array,
-    bin_transients,
-    make_bins,
-    ScrollPlot,
-    contiguous_regions,
-    stack_padding,
-    distinct_colors,
-    group_consecutives,
-    open_minian,
-    cluster_corr,
-)
-import seaborn as sns
 import math
+import os
+import pickle as pkl
 import random
-import ruptures as rpt
+import warnings
+from itertools import cycle, islice, product
+
+import matplotlib
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 import networkx as nx
-from networkx.algorithms.approximation.clustering_coefficient import average_clustering
-from CaImaging.plotting import (
-    errorfill,
-    beautify_ax,
-    jitter_x,
-    shiftedColorMap,
-    plot_xy_line,
-)
-from scipy.stats import (
-    spearmanr,
-    zscore,
-    circmean,
-    kendalltau,
-    wilcoxon,
-    mannwhitneyu,
-    pearsonr,
-    ttest_ind,
-    chisquare,
-    ttest_rel,
-    ttest_1samp,
-    kstest,
-    uniform,
-)
+import numpy as np
+import pandas as pd
+import pingouin as pg
+import pymannkendall as mk
+import ruptures as rpt
+import seaborn as sns
+import xarray as xr
+from matplotlib.pyplot import cm
+from networkx.algorithms.approximation.clustering_coefficient import \
+    average_clustering
 from numpy.lib.stride_tricks import sliding_window_view
 from scipy.optimize import curve_fit
 from scipy.spatial import distance
-from joblib import Parallel, delayed
-from CircleTrack.SessionCollation import MultiAnimal
-from CircleTrack.MiniscopeFunctions import CalciumSession
-from CaImaging.CellReg import rearrange_neurons, trim_map, scrollplot_footprints
-from sklearn.naive_bayes import BernoulliNB, GaussianNB
-from sklearn.model_selection import StratifiedKFold, KFold
-from statsmodels.stats.multitest import multipletests
-from statsmodels.tsa.stattools import adfuller, grangercausalitytests
-from sklearn.impute import SimpleImputer
+from scipy.stats import (chisquare, circmean, pearsonr, spearmanr, ttest_1samp,
+                         ttest_ind, ttest_rel, wilcoxon, zscore)
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
-import numpy as np
-import os
-from CircleTrack.plotting import (
-    plot_daily_rasters,
-    spiral_plot,
-    highlight_column,
-    plot_port_activations,
-    color_boxes,
-    plot_raster,
-)
-from CaImaging.Assemblies import (
-    find_assemblies,
-    preprocess_multiple_sessions,
-    lapsed_activation,
-)
-from CircleTrack.Assemblies import (
-    plot_assembly,
-    find_members,
-    find_memberships,
-    plot_pattern,
-)
-import xarray as xr
-import pymannkendall as mk
 from sklearn.metrics.pairwise import cosine_similarity
-from itertools import product, cycle, islice
-from CaImaging.PlaceFields import spatial_bin, PlaceFields, define_field_bins
+from sklearn.model_selection import KFold
+from sklearn.naive_bayes import BernoulliNB, GaussianNB
+from statsmodels.stats.multitest import multipletests
+from statsmodels.tsa.stattools import adfuller, grangercausalitytests
 from tqdm import tqdm
-import matplotlib.patches as mpatches
-import matplotlib.gridspec as gridspec
-import warnings
-import pickle as pkl
-from CircleTrack.utils import (
-    get_circular_error,
-    format_spatial_location_for_decoder,
-    get_equivalent_local_path,
-    find_reward_spatial_bins,
-)
-import pandas as pd
-import pingouin as pg
+
+from Assemblies import find_members, plot_assembly, plot_pattern
+from MiniscopeFunctions import CalciumSession
+from plotting import (color_boxes, highlight_column, plot_daily_rasters,
+                      plot_port_activations, plot_raster, spiral_plot)
+from SessionCollation import MultiAnimal
+from utils import (find_reward_spatial_bins,
+                   format_spatial_location_for_decoder, get_circular_error,
+                   get_equivalent_local_path)
+
+from ..CaImaging.Assemblies import (find_assemblies, lapsed_activation,
+                                    preprocess_multiple_sessions)
+from ..CaImaging.CellReg import (rearrange_neurons, scrollplot_footprints,
+                                 trim_map)
+from ..CaImaging.PlaceFields import PlaceFields, define_field_bins, spatial_bin
+from ..CaImaging.plotting import (beautify_ax, errorfill, jitter_x,
+                                  plot_xy_line, shiftedColorMap)
+from ..CaImaging.util import (ScrollPlot, bin_transients, cluster_corr,
+                              distinct_colors, group_consecutives, make_bins,
+                              nan_array, open_minian, sem, stack_padding)
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

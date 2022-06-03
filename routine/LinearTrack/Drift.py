@@ -1,20 +1,21 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-from CircleTrack.SessionCollation import MultiAnimal
-from CircleTrack.BehaviorFunctions import BehaviorSession
-from LinearTrack.MiniscopeFunctions import CalciumSession
-from CaImaging.Behavior import spatial_bin
-from sklearn.impute import SimpleImputer
-from CaImaging.CellReg import rearrange_neurons, trim_map
-from scipy.stats import spearmanr, pearsonr
-from CaImaging.util import nan_array, sem
 from itertools import product
-from CaImaging.plotting import jitter_x
+
 import matplotlib.patches as mpatches
-import xarray as xr
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-from CaImaging.plotting import errorfill, beautify_ax
+import xarray as xr
+from scipy.stats import pearsonr, spearmanr
+from sklearn.impute import SimpleImputer
+
+from MiniscopeFunctions import CalciumSession
+
+from ..CaImaging.Behavior import spatial_bin
+from ..CaImaging.CellReg import rearrange_neurons, trim_map
+from ..CaImaging.plotting import beautify_ax, errorfill, jitter_x
+from ..CaImaging.util import nan_array, sem
+from ..CircleTrack.BehaviorFunctions import BehaviorSession
+from ..CircleTrack.SessionCollation import MultiAnimal
 
 plt.rcParams["pdf.fonttype"] = 42
 plt.rcParams["svg.fonttype"] = "none"

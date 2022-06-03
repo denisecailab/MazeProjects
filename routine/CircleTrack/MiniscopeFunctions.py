@@ -1,34 +1,31 @@
-from CircleTrack.BehaviorFunctions import BehaviorSession
-import matplotlib.pyplot as plt
-import numpy as np
-from CaImaging.util import nan_array, ScrollPlot, \
-    sync_cameras_v4
-from CaImaging.Miniscope import get_transient_timestamps, \
-    nan_corrupted_frames
-from util import Session_Metadata, find_timestamp_file
-from CircleTrack.BehaviorFunctions import linearize_trajectory, make_tracking_video
-from CircleTrack.plotting import plot_spiral, plot_raster, spiral_plot
-from CaImaging.PlaceFields import PlaceFields, define_field_bins
-from CaImaging.Behavior import spatial_bin
-import holoviews as hv
 import os
 import pickle as pkl
+
+import holoviews as hv
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import gridspec
-from CaImaging.Assemblies import (
-    find_assemblies,
-    preprocess_multiple_sessions,
-    membership_sort,
-    plot_assemblies,
-)
-from CircleTrack.utils import sync, get_equivalent_local_path, find_reward_spatial_bins
-from CircleTrack.Assemblies import (
-    write_assembly_triggered_movie,
-    plot_assembly,
-    find_members,
-)
+from routine.util import Session_Metadata, find_timestamp_file
+
+from Assemblies import (find_members, plot_assembly,
+                        write_assembly_triggered_movie)
+from BehaviorFunctions import (BehaviorSession, linearize_trajectory,
+                               make_tracking_video)
+from plotting import plot_raster, plot_spiral, spiral_plot
+from utils import find_reward_spatial_bins, get_equivalent_local_path, sync
+
+from ..CaImaging.Assemblies import (find_assemblies, membership_sort,
+                                    plot_assemblies,
+                                    preprocess_multiple_sessions)
+from ..CaImaging.Behavior import spatial_bin
+from ..CaImaging.Miniscope import (get_transient_timestamps,
+                                   nan_corrupted_frames)
+from ..CaImaging.PlaceFields import PlaceFields, define_field_bins
+from ..CaImaging.util import ScrollPlot, nan_array, sync_cameras_v4
 
 hv.extension("bokeh")
 from itertools import product
+
 from scipy.stats import spearmanr, zscore
 
 

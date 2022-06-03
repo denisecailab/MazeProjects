@@ -1,33 +1,26 @@
 import os
+import re
+import shutil
+import tkinter as tk
+from pathlib import Path
+from shutil import copyfile
 
+import cv2
+import numpy as np
+import pandas as pd
+from natsort import natsorted
 from scipy.stats import circmean, mode
+from skimage.feature import register_translation
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import BernoulliNB
-import shutil
 from tqdm import tqdm
 
-from CaImaging.util import (
-    concat_avis,
-    sync_data,
-    find_closest,
-    search_for_folders,
-    search_for_files,
-    make_bins,
-)
-import numpy as np
-import tkinter as tk
-
-from CaImaging.PlaceFields import spatial_bin
+from ..CaImaging.PlaceFields import spatial_bin
+from ..CaImaging.util import (concat_avis, find_closest, make_bins,
+                              search_for_files, search_for_folders, sync_data)
 
 tkroot = tk.Tk()
 tkroot.withdraw()
-from pathlib import Path
-import pandas as pd
-from natsort import natsorted
-from shutil import copyfile
-import cv2
-import re
-from skimage.feature import register_translation
 
 
 def circle_sizes(x, y):

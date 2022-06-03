@@ -1,12 +1,12 @@
-import numpy
-import numpy as np
-import matplotlib.pyplot as plt
-import cv2
-from scipy.stats import zscore
 import os
-from tqdm import tqdm
-from CaImaging import util
-from CaImaging.Behavior import spatial_bin
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import zscore
+
+from ..CaImaging import util
+from ..CaImaging.Behavior import spatial_bin
 
 
 def plot_assembly(

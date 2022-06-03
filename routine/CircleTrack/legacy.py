@@ -1,13 +1,14 @@
 import numpy as np
 from grid_strategy.strategies import RectangularStrategy
-from matplotlib import patches as mpatches, pyplot as plt
+from matplotlib import patches as mpatches
+from matplotlib import pyplot as plt
 from scipy.stats import wilcoxon
 from statsmodels.stats.multitest import multipletests
 
-from CaImaging.plotting import errorfill
-from CaImaging.util import nan_array, sem
-from CircleTrack.BehaviorFunctions import BehaviorSession
-from CircleTrack.SessionCollation import MultiAnimal
+from SessionCollation import MultiAnimal
+
+from ..CaImaging.plotting import errorfill
+from ..CaImaging.util import nan_array, sem
 
 
 class BatchBehaviorAnalyses:

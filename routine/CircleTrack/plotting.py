@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import to_rgba
 
-from CaImaging.util import check_attrs
+from ..CaImaging.util import check_attrs
 
 
 def plot_spiral(ScrollObj):

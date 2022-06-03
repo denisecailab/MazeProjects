@@ -1,15 +1,19 @@
-import pickle as pkl
-import numpy as np
 import os
+import pickle as pkl
+
 import matplotlib.pyplot as plt
-from LinearTrack.BehaviorFunctions import BehaviorSession
-from util import Session_Metadata, find_timestamp_file
-from LinearTrack.plotting import plot_raster, plot_directional_raster
-from CircleTrack.utils import sync, get_equivalent_local_path, find_reward_spatial_bins
-from CaImaging.Miniscope import get_transient_timestamps, nan_corrupted_frames
-from CaImaging.PlaceFields import PlaceFields
-from CaImaging.Behavior import spatial_bin
-from CaImaging.util import nan_array, ScrollPlot
+import numpy as np
+
+from BehaviorFunctions import BehaviorSession
+from plotting import plot_directional_raster, plot_raster
+
+from ..CaImaging.Behavior import spatial_bin
+from ..CaImaging.Miniscope import (get_transient_timestamps,
+                                   nan_corrupted_frames)
+from ..CaImaging.PlaceFields import PlaceFields
+from ..CaImaging.util import ScrollPlot, nan_array
+from ..CircleTrack.utils import get_equivalent_local_path, sync
+from ..util import Session_Metadata
 
 
 class CalciumSession:

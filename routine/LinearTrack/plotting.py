@@ -1,6 +1,7 @@
 import numpy as np
-from matplotlib import pyplot as plt
-from CaImaging.util import check_attrs
+
+from ..CaImaging.util import check_attrs
+
 
 def plot_raster(ScrollObj):
     attrs = ["rasters", "tuning_curves", "binary"]
