@@ -2,7 +2,7 @@ import os
 import pickle as pkl
 from itertools import product
 
-import holoviews as hv
+# import holoviews as hv
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec
@@ -28,7 +28,7 @@ from .BehaviorFunctions import (
 from .plotting import plot_raster, plot_spiral, spiral_plot
 from .utils import find_reward_spatial_bins, get_equivalent_local_path, sync
 
-hv.extension("bokeh")
+# hv.extension("bokeh")
 
 
 class CalciumSession:
@@ -549,37 +549,37 @@ class CalciumSession:
 
         return reliability_matrix
 
-    def viz_spatial_trial_activity(self, neurons=range(10), preserve_neuron_idx=True):
-        """
-        Visualize single cell activity binned in spatial and separated
-        by trials.
+    # def viz_spatial_trial_activity(self, neurons=range(10), preserve_neuron_idx=True):
+    #     """
+    #     Visualize single cell activity binned in spatial and separated
+    #     by trials.
 
-        :parameters
-        ---
-        bin_size_radians: float
-            Spatial bin size in radians.
+    #     :parameters
+    #     ---
+    #     bin_size_radians: float
+    #         Spatial bin size in radians.
 
-        neurons: array-like of ints
-            List of neuron indices.
+    #     neurons: array-like of ints
+    #         List of neuron indices.
 
-        preserve_neuron_idx: boolean
-            In the output dict, viz_fields, this flag either keeps the
-            neuron index or reassigns all neurons to new dict keys
-            starting from 0. The latter option is useful for neurons
-            registered across days and serves as a global index for
-            Holomap to access.
-        """
-        fields = self.spatial_activity_by_trial()[0]
+    #     preserve_neuron_idx: boolean
+    #         In the output dict, viz_fields, this flag either keeps the
+    #         neuron index or reassigns all neurons to new dict keys
+    #         starting from 0. The latter option is useful for neurons
+    #         registered across days and serves as a global index for
+    #         Holomap to access.
+    #     """
+    #     fields = self.spatial_activity_by_trial()[0]
 
-        if preserve_neuron_idx:
-            viz_fields = {n: hv.Image(fields[n] > 0).opts(cmap="gray") for n in neurons}
-        else:
-            viz_fields = {
-                i: hv.Image(fields[n] > 0).opts(cmap="gray")
-                for i, n in enumerate(neurons)
-            }
+    #     if preserve_neuron_idx:
+    #         viz_fields = {n: hv.Image(fields[n] > 0).opts(cmap="gray") for n in neurons}
+    #     else:
+    #         viz_fields = {
+    #             i: hv.Image(fields[n] > 0).opts(cmap="gray")
+    #             for i, n in enumerate(neurons)
+    #         }
 
-        return viz_fields
+    #     return viz_fields
 
     def correlate_spatial_PVs_by_trial(self, show_plot=True):
         """
