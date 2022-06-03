@@ -126,6 +126,7 @@ class RecentReversal:
     def __init__(
         self,
         mice,
+        db_fname,
         project_name="RemoteReversal",
         behavior_only=False,
         save_figs=True,
@@ -135,6 +136,7 @@ class RecentReversal:
         # Collect data from all mice and sessions.
         self.data = MultiAnimal(
             mice,
+            db_fname=db_fname,
             project_name=project_name,
             SessionFunction=CalciumSession,
         )

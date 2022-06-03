@@ -994,14 +994,16 @@ def fix_video(fnames, frame_numbers):
     cv2.destroyAllWindows()
 
 
-def search_for_folders(folder, expression):
+def search_for_folders(folder, expression=None):
     folders = []
     for root, dirs, _ in os.walk(folder):
         dirs[:] = [d for d in dirs if not re.match("^.*\.zarr$", d)]
         for directory in dirs:
-            if re.match(expression, directory):
+            if expression is not None:
+                if re.match(expression, directory):
+                    folders.append(os.path.join(root, directory))
+            else:
                 folders.append(os.path.join(root, directory))
-
     return folders
 
 

@@ -6,21 +6,21 @@ from .BehaviorFunctions import BehaviorSession
 from .MiniscopeFunctions import CalciumSession
 from .sql import Database
 
-directory = r"D:"
-db_fname = "database.sqlite"
+# directory = r"D:"
+# db_fname = "database.sqlite"
 
 
 def MultiSession(
     mouse,
     project_name="Drift",
-    directory=directory,
-    db_fname=db_fname,
+    db_fname="./database.sqlite",
     SessionFunction=CalciumSession,
     session_types=None,
     **kwargs,
 ):
 
-    db = Database(directory, db_fname)
+    # db = Database(directory, db_fname)
+    db = Database(db_name=db_fname)
     sql_str = """
         SELECT session.session_name, session.path
         FROM session
@@ -63,7 +63,11 @@ def MultiSession(
 
 
 def MultiAnimal(
-    mice, project_name="Drift", SessionFunction=CalciumSession, session_types=None
+    mice,
+    db_fname="./database.sqlite",
+    project_name="Drift",
+    SessionFunction=CalciumSession,
+    session_types=None,
 ):
     sessions_by_mouse = dict()
 
@@ -71,6 +75,7 @@ def MultiAnimal(
         print(f"Loading data from {mouse}")
         sessions_by_mouse[mouse] = MultiSession(
             mouse,
+            db_fname=db_fname,
             project_name=project_name,
             SessionFunction=SessionFunction,
             session_types=session_types,

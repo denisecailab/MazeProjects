@@ -7,11 +7,15 @@ import regex
 
 from ..CaImaging.util import search_for_folders
 
-mouse_csv = r"Z:\Will\mouse_info.csv"
-
 
 class Database:
-    def __init__(self, directory=r"D:", db_name="database.sqlite", from_scratch=False):
+    def __init__(
+        self,
+        projects=dict(),
+        db_name="./database.sqlite",
+        mouse_csv=r"Z:\Will\mouse_info.csv",
+        from_scratch=False,
+    ):
         """
         Save a SQL database containing metadata for every mouse recorded, including mouse ID/name, datetime, and file paths
         to important data.
@@ -27,8 +31,9 @@ class Database:
         from_scratch: bool
             Whether to recompile the database from scratch or not.
         """
-        self.directory = directory
-        self.db_path = os.path.join(self.directory, db_name)
+        self.projects = projects
+        self.project_folders = list(projects.values())
+        self.db_path = db_name
 
         if from_scratch:
             if os.path.exists(self.db_path):
@@ -36,9 +41,11 @@ class Database:
 
         self.connection = sqlite3.connect(self.db_path)
         self.cursor = self.connection.cursor()
+        self.mouse_csv = mouse_csv
 
         # Find all folders named 'Data'. The next folders inside should be mice.
-        self.project_folders = search_for_folders(self.directory, "Data")
+        # self.project_folders = search_for_folders(self.directory, data_pat)
+        # self.project_folders = self.directory
         self.path_levels = {
             "mouse": -3,
             "date": -2,
@@ -105,10 +112,7 @@ class Database:
         )
 
     def populate_projects(self):
-        projects = [
-            (i + 1, os.path.split(os.path.split(folder)[0])[-1], folder)
-            for i, folder in enumerate(self.project_folders)
-        ]
+        projects = [(i + 1, p, f) for i, (p, f) in enumerate(self.projects.items())]
 
         self.cursor.executemany(
             """
@@ -118,7 +122,7 @@ class Database:
         )
 
     def populate_mice(self):
-        mouse_info = pd.read_csv(mouse_csv)
+        mouse_info = pd.read_csv(self.mouse_csv)
         for project in self.project_folders:
             mice_ = [
                 (os.path.split(f.path)[-1],) for f in os.scandir(project) if f.is_dir()
