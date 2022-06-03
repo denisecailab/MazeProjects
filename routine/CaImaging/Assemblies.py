@@ -15,7 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
 from tqdm import tqdm
 
-import util
+from . import util
 from .Miniscope import get_transient_timestamps
 
 __author__ = "Vítor Lopes dos Santos"
