@@ -44,7 +44,7 @@ class CalciumSession:
         overwrite_placefields=False,
         overwrite_placefield_trials=False,
         overwrite_assemblies=False,
-        local=True,
+        local=False,
     ):
         """
         Single session analyses and plots for miniscope data.
