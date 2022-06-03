@@ -246,6 +246,21 @@ class Metadata_CSV:
         return mice
 
 
+def walklevel(path, depth=1):
+    if depth < 0:
+        for root, dirs, files in os.walk(path):
+            yield root, dirs[:], files
+        return
+    elif depth == 0:
+        return
+    base_depth = path.rstrip(os.path.sep).count(os.path.sep)
+    for root, dirs, files in os.walk(path):
+        yield root, dirs[:], files
+        cur_depth = root.count(os.path.sep)
+        if base_depth + depth <= cur_depth:
+            del dirs[:]
+
+
 if __name__ == "__main__":
     # paths = grab_paths(r'Z:\Will\Drift\Data\Castor_Scope05\09_06_2020_CircleTrackShaping1\17_11_36')
     Metadata_CSV(r"Z:\Will\Drift\Data", overwrite=True)
