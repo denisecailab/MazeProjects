@@ -10,6 +10,7 @@ from itertools import zip_longest
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.matlib
 from scipy import stats
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
