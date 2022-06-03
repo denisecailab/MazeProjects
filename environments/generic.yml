@@ -258,3 +258,5 @@ dependencies:
   - zfp=0.5.5
   - black
   - pyserial
+  - pymannkendall
+  - regex
