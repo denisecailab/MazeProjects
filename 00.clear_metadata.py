@@ -1,5 +1,6 @@
 #%% imports and definitions
-from routine.CircleTrack.BehaviorFunctions import Preprocess
+import os
+
 from routine.util import walklevel
 
 IN_DPATH = "./data"
@@ -7,5 +8,7 @@ IN_DPATH = "./data"
 #%% preprocess behaviors
 for root, dirs, files in walklevel(IN_DPATH, depth=3):
     if "Miniscope" in dirs:
-        P = Preprocess(root)
-        P.final_save()
+        try:
+            os.remove(os.path.join(root, "metadata.pkl"))
+        except OSError:
+            pass
