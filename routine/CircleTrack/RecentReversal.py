@@ -206,6 +206,7 @@ class RecentReversal:
             str(folder),
             f'{fname}.{self.save_configs["ext"]}',
         )
+        os.makedirs(os.path.dirname(fpath), exist_ok=True)
         fig.savefig(fpath, bbox_inches="tight")
 
     def ages_to_plot_parser(self, ages_to_plot):
@@ -2557,7 +2558,7 @@ class RecentReversal:
             fig.supylabel("Neuron #")
             fig.supxlabel("Linearized position")
 
-            return split_pfs
+        return split_pfs
 
     def session_pairwise_PV_corr_efficient(
         self, mouse, nbins=125, corr="spearman", show_plot=False
@@ -10422,13 +10423,26 @@ class RecentReversal:
     #     )
     #     return changepoints, binned_activations
 
-    def make_fig1(self, panels=None):
+    def make_fig1(self, corr_matrices, panels=None, mouse=None):
         folder = 1
-        with open(r"Z:\Will\RemoteReversal\Data\PV_corr_matrices.pkl", "rb") as file:
-            corr_matrices = pkl.load(file)
 
         if panels is None:
-            panels = ["A", "C", "D", "E", "F", "G", "H"]
+            panels = [
+                "A",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J",
+                "K",
+                "L",
+                "M",
+                "N",
+                "O",
+            ]
 
         if "B" in panels:
             age = "young"
@@ -10483,7 +10497,8 @@ class RecentReversal:
                 self.save_fig(fig, "Persev licking", folder)
 
         if "H" in panels:
-            mouse = "Naiad"
+            if mouse is None:
+                mouse = "Naiad"
             fig = self.plot_max_projs(mouse)
 
             if self.save_configs["save_figs"]:
@@ -10502,14 +10517,16 @@ class RecentReversal:
             return n_neurons
 
         if "K" in panels:
-            mouse = "Miranda"
+            if mouse is None:
+                mouse = "Miranda"
             _, fig = self.scrollplot_rasters_by_day(mouse, self.meta["session_types"])
 
             if self.save_configs["save_figs"]:
                 self.save_fig(fig, f"{mouse}_longitudinal_cell", folder)
 
         if "L" in panels:
-            mouse = "Fornax"
+            if mouse is None:
+                mouse = "Fornax"
             fig = self.snakeplot_matched_placefields(
                 mouse,
                 self.meta["session_types"],
@@ -10602,13 +10619,14 @@ class RecentReversal:
 
             return remap_score_df
 
-    def make_fig2(self, panels=None):
+    def make_fig2(self, panels=None, mouse=None):
         folder = 2
         if panels is None:
             panels = ["A", "B", "C", "D", "E"]
 
         if "A" in panels:
-            mouse = "Fornax"
+            if mouse is None:
+                mouse = "Fornax"
             session_type = "Goals4"
             ensembles = [0, 1, 2, 3]
 
@@ -10618,7 +10636,8 @@ class RecentReversal:
                 self.save_fig(fig, f"{mouse} ensemble patterns {session_type}", folder)
 
         if "B" in panels:
-            mouse = "Lyra"
+            if mouse is None:
+                mouse = "Lyra"
             session_type = "Goals4"
             ensemble = 38
             fig = self.plot_ensemble(mouse, session_type, ensemble)
@@ -10629,7 +10648,8 @@ class RecentReversal:
                 )
 
         if "C" in panels:
-            mouse = "Lyra"
+            if mouse is None:
+                mouse = "Lyra"
             session_type = "Goals4"
             ensemble = 38
             fig = self.plot_ensemble_raster(mouse, session_type, ensemble, bin_size=0.2)
@@ -10660,7 +10680,8 @@ class RecentReversal:
             return anova_df, pairwise_df, errors_df
 
         if "F" in panels:
-            mouse = "Miranda"
+            if mouse is None:
+                mouse = "Miranda"
             ensemble_fields, fig = self.snakeplot_matched_ensembles(
                 mouse, ("Goals3", "Goals4")
             )
@@ -10688,13 +10709,14 @@ class RecentReversal:
 
             return df
 
-    def make_fig3(self, panels=None):
+    def make_fig3(self, panels=None, mouse=None):
         if panels is None:
             panels = ["A", "B", "C", "D", "E", "F", "G", "H"]
         folder = 3
 
         if "A" in panels:
-            mouse = "Lyra"
+            if mouse is None:
+                mouse = "Lyra"
             session_type = "Reversal"
             ensemble = 56
             fig = self.plot_ensemble(mouse, session_type, ensemble)
@@ -10717,7 +10739,8 @@ class RecentReversal:
                 )
 
         if "B" in panels:
-            mouse = "Lyra"
+            if mouse is None:
+                mouse = "Lyra"
             session_type = "Reversal"
             ensemble = 58
             fig = self.plot_ensemble(mouse, session_type, ensemble)
@@ -10789,7 +10812,8 @@ class RecentReversal:
                 )
 
         if "F" in panels:
-            mouse = "Fornax"
+            if mouse is None:
+                mouse = "Fornax"
             ensemble_number = 54
             fig, cbar_fig = self.plot_graph_evolution(
                 mouse, "Reversal", ensemble_number, plot_cbar=True
@@ -10815,7 +10839,7 @@ class RecentReversal:
 
             return anova_dfs
 
-    def make_fig4(self, panels=None):
+    def make_fig4(self, panels=None, mouse=None):
         if panels is None:
             panels = ["A", "B", "C", "D"]
 
@@ -10834,7 +10858,8 @@ class RecentReversal:
             return anova_dfs
 
         if "B" in panels:
-            mouse = "Fornax"
+            if mouse is None:
+                mouse = "Fornax"
             n_splits = 6
             fig = self.plot_degree_distribution(mouse, "Reversal", 8, n_splits=n_splits)
 
@@ -10842,7 +10867,8 @@ class RecentReversal:
                 self.save_fig(fig, f"Degree distribution {mouse}", folder)
 
         if "C" in panels:
-            mouse = "Fornax"
+            if mouse is None:
+                mouse = "Fornax"
             ensembles = [8, 35, 52, 54]
             n_splits = 6
             fig, axs = plt.subplots(len(ensembles), n_splits, figsize=(9, 4.8))
@@ -11184,15 +11210,18 @@ class RecentReversal:
 
             return ensemble_size_df
 
-    def make_sfig5(self, panels=None):
+    def make_sfig5(self, panels=None, mouse=None):
         if panels is None:
             panels = ["A", "B", "C", "D"]
         folder = "S5"
         if "A" in panels:
-            self.plot_ensemble_registration_ex()
+            if mouse is None:
+                mouse = "Miranda"
+            self.plot_ensemble_registration_ex(mouse=mouse)
 
         if "B" in panels:
-            mouse = "Miranda"
+            if mouse is None:
+                mouse = "Miranda"
             subset = [11]
             fig = self.plot_matched_ensembles(mouse, ("Goals3", "Goals4"), subset=[11])
 
@@ -11200,7 +11229,8 @@ class RecentReversal:
                 self.save_fig(fig, f"{mouse}_Ensemble{subset}_matched", folder)
 
         if "C" in panels:
-            mouse = "Miranda"
+            if mouse is None:
+                mouse = "Miranda"
             session_types = ["Goals3", "Goals4"]
             ensembles = [11, 10]
 
@@ -11561,13 +11591,14 @@ class RecentReversal:
             if self.save_configs["save_figs"]:
                 self.save_fig(fig, f"{performance_metric} downsamp", folder)
 
-    def make_sfig10(self, panels=None):
+    def make_sfig10(self, panels=None, mouse=None):
         if panels is None:
             panels = ["A", "B"]
         folder = "S8"
 
         if "A" in panels:
-            mouse = "Umbriel"
+            if mouse is None:
+                mouse = "Umbriel"
             ensemble_number = 1
             fig, cbar_fig = self.plot_graph_evolution(
                 mouse, "Reversal", ensemble_number, plot_cbar=True
