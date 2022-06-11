@@ -65,7 +65,7 @@ exclude_non_learners = True
 if exclude_non_learners:
     [PSAM_mice.remove(x) for x in ["PSAM_" + str(i) for i in [13, 15]]]
 [PSAM_mice.remove(x) for x in mistargets]
-C = Chemogenetics(PSAM_mice, actuator="PSAM")
+C = Chemogenetics(PSAM_mice, actuator="PSAM", db_fname=IN_DB, save_path=FIG_PATH)
 
 # %% [markdown]
 # # Figure 1.

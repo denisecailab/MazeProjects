@@ -75,13 +75,17 @@ class Chemogenetics:
         self,
         mice,
         actuator="DREADDs",
+        db_fname="./database.sqlite",
         save_figs=True,
         ext="pdf",
         save_path=r"C:\Users\wm228\Documents\GitHub\memory_flexibility\Figures",
     ):
         project_name = project_names[actuator]
         self.data = MultiAnimal(
-            mice, project_name=project_name, SessionFunction=BehaviorSession
+            mice,
+            project_name=project_name,
+            SessionFunction=BehaviorSession,
+            db_fname=db_fname,
         )
 
         self.save_configs = {
@@ -130,6 +134,7 @@ class Chemogenetics:
             str(folder),
             f'{fname}.{self.save_configs["ext"]}',
         )
+        os.makedirs(os.path.dirname(fpath), exist_ok=True)
         fig.savefig(fpath)
 
     def set_legend(self, fig, groups=None, colors=None, loc="lower right"):
