@@ -6,7 +6,7 @@ from routine.util import walklevel
 IN_DPATH = "./data"
 
 #%% preprocess behaviors
-for root, dirs, files in walklevel(IN_DPATH, depth=3):
+for root, dirs, files in walklevel(IN_DPATH, depth=4):
     if "Miniscope" in dirs:
         try:
             os.remove(os.path.join(root, "metadata.pkl"))

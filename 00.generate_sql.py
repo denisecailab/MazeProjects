@@ -1,8 +1,10 @@
 #%% imports and definitions
-import os
 from routine.CircleTrack.sql import Database
 
-IN_PROJ = {"RemoteReversal": "./data"}
+IN_PROJ = {
+    "RemoteReversal": "./data/RemoteReversal",
+    "PSAMReversal": "./data/PSAMReversal",
+}
 IN_MOUSE_INFO = "./data/mouse_info.csv"
 OUT_DB = "./intermediate/database.sqlite"
 
