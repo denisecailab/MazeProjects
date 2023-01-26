@@ -1,4 +1,5 @@
 #%% imports
+import os
 import pickle as pkl
 import warnings
 
@@ -6,7 +7,7 @@ from routine.CircleTrack.RecentReversal import RecentReversal
 
 warnings.filterwarnings("ignore")
 
-IN_ANM = ["Janus", "PhantomLyra"]
+IN_ANM = os.listdir("./data/RemoteReversal")
 IN_DB = "./intermediate/database.sqlite"
 OUT_PV_CORR = "./intermediate/pv_corr.pkl"
 #%% compute pv corr

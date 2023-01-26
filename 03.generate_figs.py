@@ -10,25 +10,23 @@ from routine.CircleTrack.RecentReversal import RecentReversal
 
 warnings.filterwarnings("ignore")
 
-# IN_ANM = [
-#         "Fornax",
-#         "Gemini",
-#         "Janus",
-#         "Lyra",
-#         "Miranda",
-#         "Naiad",
-#         "Oberon",
-#         "Puck",
-#         #"Rhea",
-#         "Sao",
-#         "Titania",
-#         "Umbriel",
-#         "Virgo",
-#         "Ymir",
-#         "Atlas"
-#     ]
-
-IN_ANM = ["Janus", "PhantomLyra"]
+IN_ANM = [
+    "Fornax",
+    "Gemini",
+    "Janus",
+    "Lyra",
+    "Miranda",
+    "Naiad",
+    "Oberon",
+    "Puck",
+    # "Rhea",
+    "Sao",
+    "Titania",
+    "Umbriel",
+    "Virgo",
+    "Ymir",
+    "Atlas",
+]
 IN_PV_CORR = "./intermediate/pv_corr.pkl"
 IN_DB = "./intermediate/database.sqlite"
 FIG_PATH = "./figs/publish"
@@ -104,16 +102,16 @@ RR.make_fig1(panels="F", corr_matrices=pv_corr)
 # ## H-L. Basic calcium imaging data
 
 # %%
-RR.make_fig1(panels="H", corr_matrices=pv_corr, mouse="Janus")
+RR.make_fig1(panels="H", corr_matrices=pv_corr)
 
 # %%
 n_neurons = RR.make_fig1(panels="J", corr_matrices=pv_corr)
 
 # %%
-RR.make_fig1(panels="K", corr_matrices=pv_corr, mouse="Janus")
+RR.make_fig1(panels="K", corr_matrices=pv_corr)
 
 # %%
-RR.make_fig1(panels="L", corr_matrices=pv_corr, mouse="Janus")
+RR.make_fig1(panels="L", corr_matrices=pv_corr)
 
 # %%
 # Decoding takes hours.
@@ -147,13 +145,13 @@ remap_score_df = RR.make_fig1(corr_matrices=pv_corr, panels="S")
 # ## A-D. Example ensembles
 
 # %%
-RR.make_fig2("A", mouse="PhantomLyra")
+RR.make_fig2("A")
 
 # %%
-RR.make_fig2("B", mouse="PhantomLyra")
+RR.make_fig2("B")
 
 # %%
-RR.make_fig2("C", mouse="PhantomLyra")
+RR.make_fig2("C")
 
 # %%
 n_ensembles = RR.make_fig2("D")
@@ -166,7 +164,7 @@ n_ensembles = RR.make_fig2("D")
 anova_df, pairwise_df, errors_df = RR.make_fig2("E")
 
 # %%
-RR.make_fig2("F", mouse="PhantomLyra")
+RR.make_fig2("F")
 
 # %%
 df = RR.make_fig2("G")
@@ -200,10 +198,10 @@ pairwise_dfs
 # ## A-B. Remodeling and non-remodeling ensembles
 
 # %%
-RR.make_fig3("A", mouse="PhantomLyra")
+RR.make_fig3("A")
 
 # %%
-RR.make_fig3("B", mouse="PhantomLyra")
+RR.make_fig3("B")
 
 # %% [markdown]
 # ## C-E. Relationship of remodeling ensembles to behavior
@@ -221,14 +219,14 @@ RR.make_fig3("E")
 # ## F-G. Intraconnectivity of remodeling ensembles
 
 # %%
-RR.make_fig3("F", mouse="Janus")
+RR.make_fig3("F")
 
 # %%
 anova_dfs = RR.make_fig3("G")
 
 # %%
-for df in anova_dfs.values():
-    display(df)
+# for df in anova_dfs.values():
+#     display(df)
 
 # %% [markdown]
 # # Figure 4
@@ -237,14 +235,14 @@ for df in anova_dfs.values():
 anova_dfs = RR.make_fig4("A")
 
 # %%
-for df in anova_dfs.values():
-    display(df)
+# for df in anova_dfs.values():
+#     display(df)
 
 # %%
-RR.make_fig4("B", mouse="Janus")
+RR.make_fig4("B")
 
 # %%
-RR.make_fig4("C", mouse="Janus")
+RR.make_fig4("C")
 
 # %%
 Degrees = RR.make_fig4("D")
@@ -252,17 +250,17 @@ Degrees = RR.make_fig4("D")
 # %% [markdown]
 # For linear mixed model statistics, run R code below, or lines `1:12` in `will_analysis.R` from https://github.com/jetsetbaxter/willmau.
 
-import rpy2.robjects.packages as rpackages
+# import rpy2.robjects.packages as rpackages
 
 # %%
 # Make sure you have emmeans package.
-from rpy2.robjects.packages import importr
-from rpy2.robjects.vectors import StrVector
+# from rpy2.robjects.packages import importr
+# from rpy2.robjects.vectors import StrVector
 
-utils = rpackages.importr("utils")
-utils.chooseCRANmirror(ind=1)
-packnames = ("emmeans", "Matrix", "lme4")
-utils.install_packages(StrVector(packnames))
+# utils = rpackages.importr("utils")
+# utils.chooseCRANmirror(ind=1)
+# packnames = ("emmeans", "Matrix", "lme4")
+# utils.install_packages(StrVector(packnames))
 
 # %%
 # %load_ext rpy2.ipython
@@ -277,8 +275,8 @@ utils.install_packages(StrVector(packnames))
 
 # lmer(degree ~ category + (1|mouse) + (1|ensemble_id:mouse) + (1|neuron_id:mouse), data = degrees) %>% summary()
 
-# # %%
-# act_rate_df = RR.make_fig4("E")
+# %%
+act_rate_df = RR.make_fig4("E")
 
 # # %% [markdown]
 # # For linear mixed model statistics, run R code below, or run lines `127:142` in `will_analysis.R` from https://github.com/jetsetbaxter/willmau.
