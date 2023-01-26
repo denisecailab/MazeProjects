@@ -260,3 +260,4 @@ dependencies:
   - pyserial
   - pymannkendall
   - regex
+  - pyarrow
